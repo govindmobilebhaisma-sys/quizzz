@@ -3,378 +3,117 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>100 संधि विच्छेद प्रश्नोत्तरी - प्रकार के साथ</title>
+    <title>मेरा हिन्दी टेस्ट सेंटर</title>
     <style>
-        :root {
-            --primary: #4a90e2;
-            --success: #2ecc71;
-            --danger: #e74c3c;
-            --info: #8e44ad;
-            --light: #f5f7fa;
-            --dark: #2c3e50;
-        }
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: var(--light);
+            background-color: #f0f2f5;
             margin: 0;
             padding: 20px;
-            color: var(--dark);
+            display: flex;
+            justify-content: center;
         }
         .container {
-            max-width: 800px;
-            margin: 0 auto;
+            max-width: 600px;
+            width: 100%;
             background: white;
             padding: 30px;
             border-radius: 15px;
-            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
-        }
-        header {
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
             text-align: center;
-            border-bottom: 2px solid #eee;
-            padding-bottom: 20px;
-            margin-bottom: 20px;
         }
-        h1 { margin: 0; color: var(--primary); }
-        .score-board {
-            position: sticky;
-            top: 10px;
-            background: var(--dark);
-            color: white;
-            padding: 10px 20px;
-            border-radius: 50px;
-            display: inline-block;
-            margin-bottom: 20px;
-            z-index: 100;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.2);
-            font-size: 1.2em;
-            font-weight: bold;
-        }
-        .question-card {
-            background: #fff;
-            border: 1px solid #e0e0e0;
-            border-radius: 10px;
-            padding: 20px;
-            margin-bottom: 25px;
-            transition: transform 0.2s;
-        }
-        .q-text {
-            font-size: 1.1em;
-            font-weight: 600;
-            margin-bottom: 15px;
-            color: #34495e;
-        }
-        .q-number {
-            color: var(--primary);
-            font-weight: bold;
-            margin-right: 10px;
-        }
-        .options-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
+        h1 { color: #1a73e8; margin-bottom: 10px; }
+        p { color: #5f6368; margin-bottom: 30px; }
+        
+        .file-list {
+            list-style: none;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
             gap: 12px;
         }
-        @media (max-width: 600px) {
-            .options-grid { grid-template-columns: 1fr; }
-        }
-        button.option {
-            padding: 12px 15px;
-            border: 2px solid #ecf0f1;
-            background: #fafafa;
-            border-radius: 8px;
-            cursor: pointer;
-            text-align: left;
-            font-size: 1em;
-            transition: all 0.2s;
-            color: #2c3e50;
-        }
-        button.option:hover:not(:disabled) {
-            background-color: #ebf5fb;
-            border-color: var(--primary);
-        }
-        button.option:disabled {
-            cursor: default;
-            opacity: 0.9;
-        }
-        button.correct {
-            background-color: #d4edda !important;
-            border-color: var(--success) !important;
-            color: #155724;
-        }
-        button.correct::after { content: ' ✔'; float: right; font-weight: bold; }
-        button.wrong {
-            background-color: #f8d7da !important;
-            border-color: var(--danger) !important;
-            color: #721c24;
-        }
-        button.wrong::after { content: ' ✖'; float: right; font-weight: bold; }
-        
-        /* Feedback Box Styling */
-        .feedback-box {
-            margin-top: 15px;
+        .file-item {
+            display: flex;
+            align-items: center;
             padding: 15px;
-            border-radius: 8px;
-            display: none;
-            font-size: 1em;
-            line-height: 1.5;
-            background-color: #f8f9fa;
-            border-left: 5px solid #ccc;
+            background: #f8f9fa;
+            border: 1px solid #e8eaed;
+            border-radius: 10px;
+            text-decoration: none;
+            color: #3c4043;
+            font-weight: 600;
+            transition: all 0.2s;
         }
-        .sandhi-type {
-            display: inline-block;
-            background-color: var(--info);
-            color: white;
-            padding: 3px 10px;
-            border-radius: 20px;
-            font-size: 0.9em;
-            margin-top: 8px;
-            font-weight: bold;
+        .file-item:hover {
+            background: #e8f0fe;
+            border-color: #1a73e8;
+            transform: translateY(-2px);
         }
+        .icon {
+            margin-right: 15px;
+            font-size: 20px;
+        }
+        .loading { color: #666; font-style: italic; }
     </style>
 </head>
 <body>
 
 <div class="container">
-    <header>
-        <h1>हिन्दी व्याकरण: संधि विच्छेद क्विज़</h1>
-        <p>कुल प्रश्न: 100 | स्तर: प्रतियोगी परीक्षा (SSC, CTET, RO/ARO, Police)</p>
-        <div class="score-board" id="scoreBoard">स्कोर: 0 / 100</div>
-    </header>
-
-    <div id="quiz-area">
-        </div>
+    <h1>📝 हिन्दी टेस्ट सेंटर</h1>
+    <p>नीचे दिए गए किसी भी टेस्ट को चुनें और अभ्यास शुरू करें:</p>
+    
+    <div id="loader" class="loading">फाइलें स्कैन की जा रही हैं...</div>
+    <ul class="file-list" id="fileList">
+        </ul>
 </div>
 
 <script>
-    // Data Format: [ "Word", ["Opt1", "Opt2", "Opt3", "Opt4"], CorrectIndex, "Sandhi Type" ]
-    const rawData = [
-        // --- स्वर संधि (दीर्घ) ---
-        ["विद्यालय", ["विद्या + आलय", "विद्य + लय", "विद्या + लय", "विद्य + आलय"], 0, "दीर्घ स्वर संधि"],
-        ["पुस्तकालय", ["पुस्त + आलय", "पुस्तक + लय", "पुस्तक + आलय", "पुस् + आलय"], 2, "दीर्घ स्वर संधि"],
-        ["भानूदय", ["भानू + उदय", "भानु + ऊदय", "भानु + उदय", "भानू + ऊदय"], 2, "दीर्घ स्वर संधि"],
-        ["कपीश", ["कपि + ईश", "कपी + ईश", "कपि + इश", "कपी + इश"], 0, "दीर्घ स्वर संधि"],
-        ["महीन्द्र", ["महि + इन्द्र", "मही + इन्द्र", "मही + ईन्द्र", "महि + ईन्द्र"], 1, "दीर्घ स्वर संधि"],
-        ["लघूर्मि", ["लघु + ऊर्मि", "लघू + उर्मि", "लघु + उर्मि", "लघू + ऊर्मि"], 0, "दीर्घ स्वर संधि"],
-        ["वधूत्सव", ["वधु + उत्सव", "वधू + उत्सव", "वधू + ऊत्सव", "वधु + ऊत्सव"], 1, "दीर्घ स्वर संधि"],
-        ["रवीन्द्र", ["रवि + ईन्द्र", "रवी + इन्द्र", "रवि + इन्द्र", "रवी + ईन्द्र"], 2, "दीर्घ स्वर संधि"],
-        ["परमार्थ", ["परम + अर्थ", "पर + मार्थ", "परमा + अर्थ", "परम + आर्थ"], 0, "दीर्घ स्वर संधि"],
-        ["देवानन्द", ["देव + आनन्द", "देवा + नन्द", "देव + नन्द", "देवान + अन्द"], 0, "दीर्घ स्वर संधि"],
-        
-        // --- स्वर संधि (गुण) ---
-        ["देवेन्द्र", ["देव + ईन्द्र", "देव + इन्द्र", "देवा + इन्द्र", "देवे + न्द्र"], 1, "गुण स्वर संधि"],
-        ["सुरेश", ["सुर + ईश", "सुर + इश", "सुरा + ईश", "सुरे + श"], 0, "गुण स्वर संधि"],
-        ["महोत्सव", ["महा + उत्सव", "महो + उत्सव", "मह + उत्सव", "महा + ओत्सव"], 0, "गुण स्वर संधि"],
-        ["परोपकार", ["पर + उपकार", "परो + पकार", "परा + उपकार", "परः + उपकार"], 0, "गुण स्वर संधि"],
-        ["सप्तर्षि", ["सप्त + ऋषि", "सप्त + रिषि", "सप्तः + ऋषि", "सप्त + ऋषी"], 0, "गुण स्वर संधि"],
-        ["महर्षि", ["महा + ऋषि", "मह + ऋषि", "मही + ऋषि", "महा + रिषि"], 0, "गुण स्वर संधि"],
-        ["जलोर्मि", ["जल + ऊर्मि", "जल + उर्मि", "जला + ऊर्मि", "जलो + र्मि"], 0, "गुण स्वर संधि"],
-        ["सूर्योदय", ["सूर्य + उदय", "सूर्यो + दय", "सुर्य + उदय", "सूर्य + ऊदय"], 0, "गुण स्वर संधि"],
-        ["रमेश", ["रमा + ईश", "रम + ईश", "रमा + इश", "रमे + श"], 0, "गुण स्वर संधि"],
-        ["राकेश", ["राका + ईश", "राक + ईश", "राका + इश", "राके + श"], 0, "गुण स्वर संधि"],
+    // --- अपनी जानकारी यहाँ भरें ---
+    const username = "YOUR_GITHUB_USERNAME"; // अपना GitHub यूजरनाम यहाँ लिखें
+    const repoName = "YOUR_REPO_NAME";     // अपनी रिपॉजिटरी का नाम यहाँ लिखें
+    // ----------------------------
 
-        // --- स्वर संधि (वृद्धि) ---
-        ["सदैव", ["सद + एव", "सदा + ऐव", "सदा + एव", "सत् + एव"], 2, "वृद्धि स्वर संधि"],
-        ["तथैव", ["तथ + एव", "तथा + एव", "तथा + ऐव", "तथ + ऐव"], 1, "वृद्धि स्वर संधि"],
-        ["महौषध", ["महा + औषध", "महा + ओषध", "मह + औषध", "महो + षध"], 0, "वृद्धि स्वर संधि"],
-        ["वनौषधि", ["वन + ओषधि", "वन + औषधि", "वनौ + षधि", "वना + औषधि"], 1, "वृद्धि स्वर संधि"],
-        ["एकैक", ["एक + एक", "एक + ऐक", "एका + एक", "एके + क"], 0, "वृद्धि स्वर संधि"],
-        ["मतैक्य", ["मत + ऐक्य", "मत + एक्य", "मता + ऐक्य", "मतो + क्य"], 0, "वृद्धि स्वर संधि"],
-        ["जलौघ", ["जल + ओघ", "जल + औघ", "जला + ओघ", "जलो + घ"], 0, "वृद्धि स्वर संधि"],
-        ["परमौदार्य", ["परम + औदार्य", "परम + उदार्य", "परमा + औदार्य", "परमो + दार्य"], 0, "वृद्धि स्वर संधि"],
-        ["महोदार्य", ["महा + औदार्य", "मह + औदार्य", "महा + उदार्य", "महो + दार्य"], 0, "वृद्धि स्वर संधि"],
-        ["महैश्वर्य", ["महा + ऐश्वर्य", "मह + ऐश्वर्य", "महा + ईश्वर", "महै + श्वर्य"], 0, "वृद्धि स्वर संधि"],
+    async function fetchFiles() {
+        const url = `https://api.github.com/repos/${username}/${repoName}/contents/`;
+        const listElement = document.getElementById('fileList');
+        const loader = document.getElementById('loader');
 
-        // --- स्वर संधि (यण) ---
-        ["यद्यपि", ["यद्य + अपि", "यदी + अपि", "यदि + अपि", "याद + अपि"], 2, "यण स्वर संधि"],
-        ["इत्यादि", ["इत + आदि", "इति + आदि", "इती + आदि", "इत्य + आदि"], 1, "यण स्वर संधि"],
-        ["स्वच्छ", ["स्व + अच्छ", "सु + अच्छ", "सू + अच्छ", "स + वच्छ"], 1, "यण स्वर संधि"],
-        ["स्वागत", ["स्व + आगत", "स + आगत", "सु + आगत", "सू + आगत"], 2, "यण स्वर संधि"],
-        ["अत्यन्त", ["अति + अन्त", "अती + अन्त", "अत्य + अन्त", "अत + अन्त"], 0, "यण स्वर संधि"],
-        ["व्यायाम", ["व्या + याम", "वि + आयाम", "विय + आयाम", "वी + आयाम"], 1, "यण स्वर संधि"],
-        ["न्यून", ["नि + ऊन", "नी + ऊन", "न्यु + ऊन", "न + यून"], 0, "यण स्वर संधि"],
-        ["प्रत्येक", ["प्रती + एक", "प्रत्य + एक", "प्रति + एक", "प्र + त्येक"], 2, "यण स्वर संधि"],
-        ["अन्वेषण", ["अनू + एषण", "अन्व + एषण", "अनु + एषण", "अन + वेषण"], 2, "यण स्वर संधि"],
-        ["मात्राज्ञा", ["मातृ + आज्ञा", "मात्रा + आज्ञा", "मात्र + आज्ञा", "मातु + आज्ञा"], 0, "यण स्वर संधि"],
+        try {
+            const response = await fetch(url);
+            const files = await response.json();
 
-        // --- स्वर संधि (अयादि) ---
-        ["नयन", ["न + अन", "ने + अन", "नै + अन", "ने + यन"], 1, "अयादि स्वर संधि"],
-        ["गायक", ["गा + यक", "गै + अक", "गे + अक", "गय + अक"], 1, "अयादि स्वर संधि"],
-        ["पवन", ["प + अवन", "पौ + अन", "पो + अन", "पा + वन"], 2, "अयादि स्वर संधि"],
-        ["पावक", ["पौ + अक", "पो + अक", "पा + वक", "पाव + क"], 0, "अयादि स्वर संधि"],
-        ["नाविक", ["नौ + इक", "नो + इक", "ना + विक", "नाव + इक"], 0, "अयादि स्वर संधि"],
-        ["भावुक", ["भो + उक", "भौ + उक", "भाव + उक", "भा + वुक"], 1, "अयादि स्वर संधि"],
-        ["शयन", ["शे + अन", "श + अयन", "शै + अन", "शौ + अन"], 0, "अयादि स्वर संधि"],
-        ["नायक", ["ने + अक", "नै + अक", "ना + यक", "नय + अक"], 1, "अयादि स्वर संधि"],
-        ["भवन", ["भौ + अन", "भव + अन", "भो + अन", "भा + वन"], 2, "अयादि स्वर संधि"],
-        ["धावक", ["धो + अक", "धौ + अक", "धाव + क", "धा + वक"], 1, "अयादि स्वर संधि"],
+            loader.style.display = 'none';
 
-        // --- व्यंजन संधि (भाग 1) ---
-        ["दिग्गज", ["दिग + गज", "दिः + गज", "दिक् + गज", "दिग् + गज"], 2, "व्यंजन संधि"],
-        ["वागीश", ["वाक् + ईश", "वाग + ईश", "वाक + ईश", "वागि + श"], 0, "व्यंजन संधि"],
-        ["दिगम्बर", ["दिग + अम्बर", "दिः + अम्बर", "दिक् + अम्बर", "दिक् + बर"], 2, "व्यंजन संधि"],
-        ["अजन्त", ["अज + अन्त", "अच + अन्त", "अच् + अन्त", "अज् + अन्त"], 2, "व्यंजन संधि"],
-        ["षडानन", ["षड + आनन", "षड् + आनन", "षट् + आनन", "षट + आनन"], 2, "व्यंजन संधि"],
-        ["जगदीश", ["जगद + ईश", "जगत + ईश", "जग + दीश", "जगत् + ईश"], 3, "व्यंजन संधि"],
-        ["सदाचार", ["सत् + आचार", "सद + आचार", "सदा + चार", "सद् + आचार"], 0, "व्यंजन संधि"],
-        ["सुबन्त", ["सुब + अन्त", "सुप + अन्त", "सुप् + अन्त", "सुब् + अन्त"], 2, "व्यंजन संधि"],
-        ["वाङ्मय", ["वाक् + मय", "वाङ् + मय", "वाग् + मय", "वाच + मय"], 0, "व्यंजन संधि"],
-        ["जगन्नाथ", ["जगन् + नाथ", "जगत् + नाथ", "जगद + नाथ", "जगत + नाथ"], 1, "व्यंजन संधि"],
-        
-        // --- व्यंजन संधि (भाग 2) ---
-        ["उन्नयन", ["उन् + नयन", "उत् + नयन", "उद् + नयन", "उन + नयन"], 1, "व्यंजन संधि"],
-        ["उच्चारण", ["उच् + चारण", "उद् + चारण", "उत् + चारण", "उच्च + रण"], 2, "व्यंजन संधि"],
-        ["सच्चरित्र", ["सच् + चरित्र", "सद + चरित्र", "सच्च + रित्र", "सत् + चरित्र"], 3, "व्यंजन संधि"],
-        ["उज्ज्वल", ["उज् + ज्वल", "उद् + ज्वल", "उत् + ज्वल", "उज + ज्वल"], 2, "व्यंजन संधि"],
-        ["सज्जन", ["सज् + जन", "सद + जन", "सत् + जन", "स + जन"], 2, "व्यंजन संधि"],
-        ["उड्डयन", ["उड् + डयन", "उद् + डयन", "उत् + डयन", "उ + डयन"], 2, "व्यंजन संधि"],
-        ["उल्लास", ["उल् + लास", "उद् + लास", "उल + आस", "उत् + लास"], 3, "व्यंजन संधि"],
-        ["तल्लीन", ["तल् + लीन", "तत् + लीन", "तद + लीन", "तल + लीन"], 1, "व्यंजन संधि"],
-        ["उद्धार", ["उद् + धार", "उत् + हार", "उद् + हार", "उध + हार"], 1, "व्यंजन संधि"],
-        ["तद्धित", ["तद् + धित", "तत् + हित", "तद् + हित", "तध + इत"], 1, "व्यंजन संधि"],
-        
-        // --- व्यंजन संधि (भाग 3) ---
-        ["उच्छ्वास", ["उच्छ + वास", "उद् + श्वास", "उत् + श्वास", "उच् + श्वास"], 2, "व्यंजन संधि"],
-        ["सच्छास्त्र", ["सच् + शास्त्र", "सत् + शास्त्र", "सद + शास्त्र", "सत् + छास्त्र"], 1, "व्यंजन संधि"],
-        ["संकर", ["सं + कर", "सन् + कर", "सम् + कर", "सङ् + कर"], 2, "व्यंजन संधि"],
-        ["संगम", ["सं + गम", "सम् + गम", "सन् + गम", "सङ् + गम"], 1, "व्यंजन संधि"],
-        ["सन्तोष", ["सम् + तोष", "सन् + तोष", "सं + तोष", "सल् + तोष"], 0, "व्यंजन संधि"],
-        ["किंचित्", ["किन् + चित्", "किं + चित्", "किम् + चित्", "किण + चित्"], 2, "व्यंजन संधि"],
-        ["संविधान", ["सं + विधान", "सम् + विधान", "सन् + विधान", "सवि + धान"], 1, "व्यंजन संधि"],
-        ["अहंकार", ["अहं + कार", "अहन् + कार", "अहम् + कार", "अह + कार"], 2, "व्यंजन संधि"],
-        ["परिच्छेद", ["परि + छेद", "परि + च्छेद", "परी + छेद", "पर + छेद"], 0, "व्यंजन संधि"],
-        ["विच्छेद", ["वि + च्छेद", "विच + छेद", "वि + छेद", "वी + छेद"], 2, "व्यंजन संधि"],
-
-        // --- विसर्ग संधि (भाग 1) ---
-        ["मनोहर", ["मन + हर", "मनो + हर", "मन + ओहर", "मनः + हर"], 3, "विसर्ग संधि"],
-        ["सरोज", ["सरो + ज", "सर + ओज", "सरः + ज", "सर + ज"], 2, "विसर्ग संधि"],
-        ["यशोधरा", ["यशः + धरा", "यशो + धरा", "यश + अधरा", "यष + धरा"], 0, "विसर्ग संधि"],
-        ["मनोबल", ["मनो + बल", "मनः + बल", "मन + बल", "मन + ओबल"], 1, "विसर्ग संधि"],
-        ["तपोभूमि", ["तपो + भूमि", "तपः + भूमि", "तप + भूमि", "तप + उभूमि"], 1, "विसर्ग संधि"],
-        ["निराशा", ["निर + आशा", "निरा + शा", "निः + आशा", "निर् + आशा"], 2, "विसर्ग संधि"],
-        ["निर्धन", ["निः + धन", "निर + धन", "निर् + धन", "नि + धन"], 0, "विसर्ग संधि"],
-        ["दुर्बल", ["दुर + बल", "दुः + बल", "दुर् + बल", "दु + बल"], 1, "विसर्ग संधि"],
-        ["आशीर्वाद", ["आशीर + वाद", "आशिः + वाद", "आशीः + वाद", "आशी + वाद"], 2, "विसर्ग संधि"],
-        ["दुराशा", ["दुर + आशा", "दुरा + शा", "दुः + आशा", "दुर् + आशा"], 2, "विसर्ग संधि"],
-
-        // --- विसर्ग संधि (भाग 2) ---
-        ["निस्सन्देह", ["निः + सन्देह", "निस् + सन्देह", "नि + सन्देह", "नी + सन्देह"], 0, "विसर्ग संधि"],
-        ["नमस्ते", ["नमस् + ते", "नमः + ते", "नमो + ते", "नम + स्ते"], 1, "विसर्ग संधि"],
-        ["मनस्ताप", ["मनस् + ताप", "मनः + ताप", "मन + ताप", "मनो + ताप"], 1, "विसर्ग संधि"],
-        ["दुस्तर", ["दुस् + तर", "दुः + तर", "दुर + तर", "दु + तर"], 1, "विसर्ग संधि"],
-        ["निश्चल", ["निश् + चल", "निः + चल", "निस् + चल", "नी + चल"], 1, "विसर्ग संधि"],
-        ["दुश्चरित्र", ["दुः + चरित्र", "दुश् + चरित्र", "दुस् + चरित्र", "दु + चरित्र"], 0, "विसर्ग संधि"],
-        ["हरिश्चन्द्र", ["हरिश् + चन्द्र", "हरिः + चन्द्र", "हरि + चन्द्र", "हरी + चन्द्र"], 1, "विसर्ग संधि"],
-        ["निष्ठुर", ["निष् + ठुर", "निः + ठुर", "नि + ठुर", "नी + ठुर"], 1, "विसर्ग संधि"],
-        ["धनुष्टंकार", ["धनुष् + टंकार", "धनुः + टंकार", "धनु + टंकार", "धनु + ष्टंकार"], 1, "विसर्ग संधि"],
-        ["निष्कपट", ["निष् + कपट", "निस् + कपट", "निः + कपट", "नि + कपट"], 2, "विसर्ग संधि"],
-
-        // --- मिश्रित (कठिन प्रश्न) ---
-        ["दुष्कर्म", ["दुष् + कर्म", "दुः + कर्म", "दुस् + कर्म", "दु + कर्म"], 1, "विसर्ग संधि"],
-        ["आविष्कार", ["आविष् + कार", "आवि + कार", "आविः + कार", "आवी + कार"], 2, "विसर्ग संधि"],
-        ["निरोग", ["निर + रोग", "निः + रोग", "निर् + रोग", "नी + रोग"], 1, "विसर्ग संधि"],
-        ["नीरस", ["नीर + रस", "निर् + रस", "निः + रस", "नी + रस"], 2, "विसर्ग संधि"],
-        ["अतएव", ["अत + एव", "अतः + एव", "अत + ऐव", "अते + व"], 1, "विसर्ग संधि"],
-        ["प्रातःकाल", ["प्रात + काल", "प्रातो + काल", "प्रातः + काल", "प्रातस + काल"], 2, "विसर्ग संधि"],
-        ["अन्तःकरण", ["अन्त + करण", "अन्तर + करण", "अन्तः + करण", "अन्न + करण"], 2, "विसर्ग संधि"],
-        ["पुरस्कार", ["पुरस् + कार", "पुरः + कार", "पुर + कार", "पुरो + कार"], 1, "विसर्ग संधि"],
-        ["भास्कर", ["भाः + कर", "भास + कर", "भाष् + कर", "भा + कर"], 0, "विसर्ग संधि"],
-        ["वाचस्पति", ["वाचस् + पति", "वाच + पति", "वाचः + पति", "वाक् + पति"], 2, "विसर्ग संधि"]
-    ];
-
-    // Convert rawData to object array for easier processing
-    const questions = rawData.map(item => ({
-        q: item[0],
-        o: item[1],
-        a: item[2],
-        t: item[3]
-    }));
-
-    let score = 0;
-    let attempted = 0;
-    const totalQuestions = questions.length; // 100
-
-    function renderQuestions() {
-        const quizArea = document.getElementById('quiz-area');
-        
-        questions.forEach((qObj, index) => {
-            const card = document.createElement('div');
-            card.className = 'question-card';
-            card.id = `q-${index}`;
-
-            const qText = document.createElement('div');
-            qText.className = 'q-text';
-            qText.innerHTML = `<span class="q-number">प्र.${index + 1}</span> '${qObj.q}' का सही संधि विच्छेद है:`;
-            card.appendChild(qText);
-
-            const optGrid = document.createElement('div');
-            optGrid.className = 'options-grid';
-
-            qObj.o.forEach((optText, optIndex) => {
-                const btn = document.createElement('button');
-                btn.className = 'option';
-                btn.innerText = optText;
-                btn.onclick = () => checkAnswer(index, optIndex, btn);
-                optGrid.appendChild(btn);
+            files.forEach(file => {
+                // सिर्फ .html फाइलों को दिखाएं और index.html को छुपा दें
+                if (file.name.endsWith('.html') && file.name !== 'index.html') {
+                    const li = document.createElement('li');
+                    
+                    // फाइल का नाम सुंदर बनाने के लिए (e.g. samas_quiz.html -> Samas Quiz)
+                    let displayName = file.name.replace('.html', '').replace(/_/g, ' ').toUpperCase();
+                    
+                    li.innerHTML = `
+                        <a href="${file.name}" class="file-item">
+                            <span class="icon">📄</span>
+                            <span>${displayName}</span>
+                        </a>
+                    `;
+                    listElement.appendChild(li);
+                }
             });
 
-            card.appendChild(optGrid);
+            if (listElement.children.length === 0) {
+                loader.style.display = 'block';
+                loader.innerText = "कोई नया टेस्ट नहीं मिला।";
+            }
 
-            const feedback = document.createElement('div');
-            feedback.className = 'feedback-box';
-            feedback.id = `feedback-${index}`;
-            card.appendChild(feedback);
-
-            quizArea.appendChild(card);
-        });
-
-        // Update initial header
-        document.querySelector('header p').innerText = `कुल प्रश्न: ${totalQuestions} | स्तर: प्रतियोगी परीक्षा`;
-    }
-
-    function checkAnswer(qIndex, selectedOptIndex, btnElement) {
-        const qObj = questions[qIndex];
-        const card = document.getElementById(`q-${qIndex}`);
-        const allBtns = card.querySelectorAll('.option');
-        const feedback = document.getElementById(`feedback-${qIndex}`);
-
-        // Disable buttons after click
-        allBtns.forEach(btn => btn.disabled = true);
-        attempted++;
-
-        let feedbackHtml = "";
-
-        if (selectedOptIndex === qObj.a) {
-            // User is Correct
-            btnElement.classList.add('correct');
-            score++;
-            feedback.style.borderLeftColor = "#2ecc71";
-            feedback.style.backgroundColor = "#d4edda";
-            feedback.style.color = "#155724";
-            feedbackHtml = `<strong>✅ बिलकुल सही उत्तर!</strong>`;
-        } else {
-            // User is Wrong
-            btnElement.classList.add('wrong');
-            allBtns[qObj.a].classList.add('correct'); // Show correct answer
-            feedback.style.borderLeftColor = "#e74c3c";
-            feedback.style.backgroundColor = "#f8d7da";
-            feedback.style.color = "#721c24";
-            feedbackHtml = `<strong>❌ गलत उत्तर!</strong> <br> सही विच्छेद: <b>${qObj.o[qObj.a]}</b>`;
+        } catch (error) {
+            console.error("Error fetching files:", error);
+            loader.innerText = "फाइलें लोड करने में समस्या हुई।";
         }
-
-        // Add Sandhi Type details at the bottom of the feedback box
-        feedbackHtml += `<br><span class="sandhi-type">📌 ${qObj.t}</span>`;
-        
-        feedback.innerHTML = feedbackHtml;
-        feedback.style.display = 'block';
-
-        updateScore();
     }
 
-    function updateScore() {
-        document.getElementById('scoreBoard').innerText = `स्कोर: ${score} / ${totalQuestions}`;
-    }
-
-    // Initialize Quiz
-    renderQuestions();
+    fetchFiles();
 </script>
 
 </body>
