@@ -3,341 +3,308 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>हिन्दी व्याकरण क्विज - तत्सम, तद्भव एवं शब्द भेद</title>
+    <title>शब्द भेद मास्टर क्विज़ - 100 प्रश्न</title>
     <style>
         :root {
             --primary: #2c3e50;
             --accent: #d35400;
-            --bg: #f1f2f6;
-            --white: #ffffff;
             --success: #27ae60;
-            --error: #e74c3c;
-            --text: #2f3640;
+            --danger: #c0392b;
+            --bg: #f1f2f6;
         }
-
-        * { box-sizing: border-box; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
-        body { background-color: var(--bg); color: var(--text); margin: 0; padding: 0; }
-
-        /* Landing Screen */
-        #landing-screen {
-            height: 100vh;
+        body { font-family: 'Segoe UI', Arial, sans-serif; background-color: var(--bg); margin: 0; padding: 10px; color: #333; }
+        
+        /* Selection Menu */
+        #menu-screen {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: var(--primary);
             display: flex;
             flex-direction: column;
             justify-content: center;
             align-items: center;
-            background: linear-gradient(135deg, var(--primary), #34495e);
-            color: white;
-            text-align: center;
-            padding: 20px;
+            z-index: 2000;
         }
-
-        .menu-card {
-            background: rgba(255, 255, 255, 0.1);
+        .menu-box {
+            background: white;
             padding: 40px;
-            border-radius: 15px;
-            backdrop-filter: blur(10px);
-            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            border-radius: 20px;
+            text-align: center;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.4);
+            max-width: 90%;
         }
-
-        .set-buttons {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 15px;
-            margin-top: 30px;
-        }
-
-        .btn-set {
-            padding: 15px 30px;
-            font-size: 1.2rem;
+        .set-btn {
+            display: inline-block;
+            width: 130px;
+            padding: 18px;
+            margin: 10px;
+            font-size: 1.3em;
+            font-weight: bold;
             border: none;
-            border-radius: 8px;
+            border-radius: 12px;
             cursor: pointer;
-            background: var(--accent);
+            transition: 0.3s;
             color: white;
-            transition: transform 0.2s, background 0.3s;
         }
-
-        .btn-set:hover { transform: translateY(-3px); background: #e67e22; }
+        .btn-a { background: #3498db; }
+        .btn-b { background: #9b59b6; }
+        .btn-c { background: #27ae60; }
+        .btn-d { background: #e67e22; }
+        .set-btn:hover { transform: scale(1.1); box-shadow: 0 5px 15px rgba(0,0,0,0.2); }
 
         /* Quiz UI */
-        #quiz-ui { display: none; }
-
-        .sticky-stats {
-            position: sticky;
-            top: 0;
-            z-index: 1000;
-            background: var(--primary);
-            color: white;
-            padding: 15px 20px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.2);
-        }
-
-        .container { max-width: 800px; margin: 20px auto; padding: 0 15px; }
-
-        .question-card {
-            background: var(--white);
-            border-left: 6px solid var(--accent);
-            border-radius: 8px;
-            padding: 20px;
-            margin-bottom: 25px;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
-        }
-
-        .question-text { font-size: 1.2rem; font-weight: 600; margin-bottom: 15px; }
-
-        .options-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 10px;
-        }
-
-        @media (max-width: 600px) { .options-grid { grid-template-columns: 1fr; } }
-
-        .opt-btn {
-            padding: 12px;
-            border: 2px solid #ddd;
-            border-radius: 6px;
-            background: white;
-            cursor: pointer;
-            text-align: left;
-            font-size: 1rem;
-            transition: all 0.2s;
-        }
-
-        .opt-btn:hover:not(:disabled) { border-color: var(--accent); background: #fffaf0; }
-
-        .correct { background-color: var(--success) !important; color: white !important; border-color: #1e8449 !important; }
-        .wrong { background-color: var(--error) !important; color: white !important; border-color: #c0392b !important; }
-
-        .explanation {
-            margin-top: 15px;
-            padding: 12px;
-            background: #e1f5fe;
-            border-radius: 5px;
-            font-size: 0.95rem;
-            display: none;
-            border-left: 4px solid #03a9f4;
-        }
-
-        .nav-controls {
-            display: flex;
-            justify-content: space-between;
-            margin: 40px 0;
-            padding-bottom: 40px;
-        }
-
-        .btn-nav {
-            padding: 12px 25px;
-            border: none;
-            border-radius: 5px;
-            background: var(--primary);
-            color: white;
-            cursor: pointer;
-        }
-
-        .btn-nav:disabled { opacity: 0.3; cursor: not-allowed; }
+        .container { max-width: 850px; margin: 0 auto; background: white; padding: 25px; border-radius: 15px; display: none; }
+        header { text-align: center; border-bottom: 3px solid var(--accent); margin-bottom: 20px; padding-bottom: 10px; }
+        .stats-bar { position: sticky; top: 10px; z-index: 1000; display: flex; justify-content: space-between; background: var(--primary); color: white; padding: 15px 20px; border-radius: 10px; margin-bottom: 20px; font-weight: bold; }
+        .q-card { background: #fff; border: 1px solid #ddd; border-radius: 10px; padding: 20px; margin-bottom: 20px; border-left: 6px solid var(--accent); }
+        .q-text { font-size: 1.15em; font-weight: 700; margin-bottom: 15px; color: #2c3e50; }
+        .options { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+        @media (max-width: 600px) { .options { grid-template-columns: 1fr; } }
+        button.opt-btn { padding: 12px; border: 1px solid #dee2e6; background: #fff; border-radius: 6px; cursor: pointer; text-align: left; font-size: 1em; }
+        button.correct { background: #d4edda !important; color: #155724; font-weight: bold; border-color: var(--success); }
+        button.wrong { background: #f8d7da !important; color: #721c24; border-color: var(--danger); }
+        .feedback { margin-top: 12px; display: none; font-weight: 600; padding: 10px; border-radius: 5px; background: #f1f2f6; border-left: 4px solid var(--accent); }
+        .pagination { display: flex; justify-content: center; gap: 15px; margin-top: 30px; border-top: 2px solid #eee; padding-top: 20px; }
+        .nav-btn { padding: 10px 30px; background: var(--accent); color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: bold; }
+        .nav-btn:disabled { background: #ccc; }
     </style>
 </head>
 <body>
 
-    <div id="landing-screen">
-        <div class="menu-card">
-            <h1>हिन्दी व्याकरण महा-क्विज</h1>
-            <p>विषय: शब्द भेद (तत्सम, तद्भव, देशज, विदेशज)</p>
-            <p>कुल प्रश्न: 100 | लक्ष्य: RO/ARO, UP Police, SSC GD</p>
-            <div class="set-buttons">
-                <button class="btn-set" onclick="startQuiz('A')">SET A</button>
-                <button class="btn-set" onclick="startQuiz('B')">SET B</button>
-                <button class="btn-set" onclick="startQuiz('C')">SET C</button>
-                <button class="btn-set" onclick="startQuiz('D')">SET D</button>
-            </div>
-        </div>
+<div id="menu-screen">
+    <div class="menu-box">
+        <h1 style="margin-top:0; color: var(--primary);">शब्द भेद: तत्सम-तद्भव</h1>
+        <p style="font-size: 1.2em; color: #555;">प्रतियोगी परीक्षा हेतु 100 महत्वपूर्ण प्रश्न।<br>एक सेट चुनें:</p>
+        <button class="set-btn btn-a" onclick="loadMixedSet('A')">SET A</button>
+        <button class="set-btn btn-b" onclick="loadMixedSet('B')">SET B</button><br>
+        <button class="set-btn btn-c" onclick="loadMixedSet('C')">SET C</button>
+        <button class="set-btn btn-d" onclick="loadMixedSet('D')">SET D</button>
+        <p style="font-size: 0.9em; margin-top: 20px; color: #7f8c8d;">नोट: प्रत्येक सेट का अपना एक विशिष्ट और स्थिर क्रम है।</p>
+    </div>
+</div>
+
+<div class="container" id="main-container">
+    <header>
+        <h1 id="quiz-title">शब्द भेद क्विज़</h1>
+        <p>तत्सम, तद्भव, देशज, विदेशज और संकर शब्द</p>
+    </header>
+
+    <div class="stats-bar">
+        <div id="scoreDisplay">स्कोर: 0 / 100</div>
+        <div id="pageDisplay">पेज: 1 / 4</div>
     </div>
 
-    <div id="quiz-ui">
-        <div class="sticky-stats">
-            <div>सेट: <span id="display-set">-</span></div>
-            <div>स्कोर: <strong id="score-val">0</strong> / 100</div>
-            <div>पेज: <span id="page-val">1</span> / 4</div>
-        </div>
+    <div id="quiz-content"></div>
 
-        <div class="container">
-            <div id="question-list"></div>
-
-            <div class="nav-controls">
-                <button id="prev-btn" class="btn-nav" onclick="changePage(-1)">← पिछला</button>
-                <button id="next-btn" class="btn-nav" onclick="changePage(1)">अगला →</button>
-            </div>
-        </div>
+    <div class="pagination">
+        <button class="nav-btn" id="prevBtn" onclick="changePage(-1)" disabled>पिछला</button>
+        <button class="nav-btn" id="nextBtn" onclick="changePage(1)">अगला</button>
     </div>
+</div>
 
 <script>
-    // --- Data Management ---
-    const rawQuestions = [
-        { q: "निम्न में से 'अग्नि' का तद्भव रूप क्या है?", o: ["आग", "अनल", "पावक", "आगी"], a: 0, t: "संस्कृत शब्द 'अग्नि' का परिवर्तित रूप 'आग' है।" },
-        { q: "'कर्पूर' शब्द का सही तद्भव शब्द चुनिए।", o: ["कपडा", "कपूर", "करुणा", "कचहरी"], a: 1, t: "कर्पूर तत्सम है, कपूर तद्भव।" },
-        { q: "'लोटा' शब्द किस श्रेणी में आता है?", o: ["तत्सम", "तद्भव", "देशज", "विदेशज"], a: 2, t: "लोटा क्षेत्रीय प्रभाव से उत्पन्न 'देशज' शब्द है।" },
-        { q: "'रिक्शा' किस भाषा का शब्द है?", o: ["चीनी", "जापानी", "तुर्की", "अरबी"], a: 1, t: "रिक्शा मूल रूप से जापानी भाषा का शब्द है।" },
-        { q: "निम्नलिखित में से तत्सम शब्द कौन सा है?", o: ["अचरज", "अमृत", "आँख", "आम"], a: 1, t: "अमृत तत्सम है, इसका तद्भव 'अमिय' होता है।" },
-        { q: "'गधा' का तत्सम रूप क्या है?", o: ["गदहा", "गर्दभ", "गधर्व", "गर्दप"], a: 1, t: "गधा तद्भव है, गर्दभ तत्सम।" },
-        { q: "'थाली' का तत्सम रूप है-", o: ["स्थाली", "थालिका", "थ्याली", "थाली"], a: 0, t: "स्थाली से थाली बना है।" },
-        { q: "'खिचड़ी' कैसा शब्द है?", o: ["देशज", "तद्भव", "तत्सम", "विदेशज"], a: 0, t: "खिचड़ी देशज शब्द की श्रेणी में आता है।" },
-        { q: "'रेलगाड़ी' शब्द है-", o: ["तद्भव", "तत्सम", "देशज", "शंकर"], a: 3, t: "दो भिन्न भाषाओं (English + Hindi) से मिलकर बना शब्द शंकर (Hybrid) कहलाता है।" },
-        { q: "'उजाला' का तत्सम रूप बताइए।", o: ["उज्वल", "उज्ज्वल", "उज्जवल", "उज्वल"], a: 1, t: "वर्तनी की दृष्टि से 'उज्ज्वल' सही तत्सम है।" },
-        { q: "'गोबर' का तत्सम रूप है-", o: ["गुरबर", "गोमय", "गह्वर", "गब्बर"], a: 1, t: "गोमय तत्सम शब्द है।" },
-        { q: "निम्न में से 'कोयल' का तत्सम क्या है?", o: ["काक", "कोकिल", "पिक", "कोकिला"], a: 1, t: "कोकिल तत्सम है, कोयल तद्भव।" },
-        { q: "'चमड़ा' का तत्सम रूप क्या है?", o: ["चाम", "चर्म", "चिक्कण", "चर्मकार"], a: 1, t: "चर्म तत्सम है, जिसका तद्भव चमड़ा है।" },
-        { q: "'मक्खी' शब्द का तत्सम रूप है-", o: ["मक्षिका", "माछी", "मच्छी", "मक्षिका"], a: 0, t: "मक्षिका तत्सम रूप है।" },
-        { q: "'हल्दी' शब्द का तत्सम है-", o: ["हरदी", "हरिद्रा", "हल्दिका", "हरिद्रिका"], a: 1, t: "हरिद्रा हल्दी का तत्सम रूप है।" },
-        { q: "कौन सा शब्द तुर्की भाषा का नहीं है?", o: ["पैगम्बर", "बेगम", "चेचक", "बारूद"], a: 0, t: "पैगम्बर फारसी शब्द है, बाकी तुर्की हैं।" },
-        { q: "'अटारी' का तत्सम रूप है-", o: ["अटारिका", "अट्टालिका", "अटलिका", "अटारी"], a: 1, t: "अट्टालिका सही तत्सम है।" },
-        { q: "'कंगन' का तत्सम रूप क्या है?", o: ["कंकण", "कंकण", "कंकणी", "कंगण"], a: 0, t: "कंकण कंगन का तत्सम है।" },
-        { q: "'कैंची' किस भाषा का शब्द है?", o: ["पुर्तगाली", "तुर्की", "अरबी", "फारसी"], a: 1, t: "कैंची तुर्की भाषा का प्रसिद्ध शब्द है।" },
-        { q: "निम्नलिखित में से 'तद्भव' शब्द पहचानिए।", o: ["नासिका", "बच्चा", "ग्रीष्म", "लक्ष्मी"], a: 1, t: "बच्चा तद्भव है, इसका तत्सम 'वत्स' होता है।" },
-        { q: "'पत्ता' का तत्सम रूप क्या है?", o: ["पत्र", "पर्ण", "पल्लव", "पात्र"], a: 0, t: "पत्र से पत्ता विकसित हुआ है।" },
-        { q: "'अलमारी' शब्द है-", o: ["फ्रांसीसी", "पुर्तगाली", "अंग्रेजी", "डच"], a: 1, t: "अलमारी, बाल्टी, चाबी पुर्तगाली शब्द हैं।" },
-        { q: "'कान' का तत्सम रूप है-", o: ["कर्ण", "कन्ना", "कर्णा", "श्रुति"], a: 0, t: "कर्ण तत्सम है।" },
-        { q: "'पक्षी' का तद्भव रूप क्या है?", o: ["पंछी", "पखेरू", "खग", "विहग"], a: 0, t: "पक्षी (तत्सम) -> पंछी (तद्भव)।" },
-        { q: "निम्न में से कौन 'योगरूढ़' शब्द है?", o: ["पीला", "जलज", "पर", "दूधवाला"], a: 1, t: "जलज (कमल के अर्थ में रूढ़) योगरूढ़ है।" },
-        // ... (Adding representative bulk data for demonstration, expanding logic to handle indices 0-99)
+    const baseQuestions = [
+        { q: "'अग्निष्ठिका' का तद्भव रूप क्या है?", o: ["अंगीठी", "अग्नि", "अंगारा", "अगहन"], a: 0, t: "अग्निष्ठिका (तत्सम) -> अंगीठी (तद्भव)" },
+        { q: "'अकार्य' शब्द का तद्भव रूप है:", o: ["अकाम", "अकाज", "अकार्थ", "अनर्थ"], a: 1, t: "अकार्य (तत्सम) -> अकाज (तद्भव)" },
+        { q: "निम्नलिखित में से तत्सम शब्द चुनिए:", o: ["चौपाया", "चारों", "चतुष्पद", "चारपाए"], a: 2, t: "चतुष्पद तत्सम शब्द है।" },
+        { q: "'शर्करा' का तद्भव रूप बताइए:", o: ["शकर", "शक्कर", "खांड़", "गुड़"], a: 1, t: "शर्करा (तत्सम) -> शक्कर (तद्भव)" },
+        { q: "निम्न में से कौन-सा शब्द 'देशज' है?", o: ["आग", "बच्चा", "खिड़की", "फूल"], a: 2, t: "खिड़की, लोटा, पगड़ी देशज शब्द हैं।" },
+        { q: "'कर्पट' का तद्भव रूप क्या है?", o: ["कपट", "कारपेट", "कपूर", "कपड़ा"], a: 3, t: "कर्पट (तत्सम) -> कपड़ा (तद्भव)" },
+        { q: "'श्मश्रु' शब्द का तद्भव रूप होगा:", o: ["मूँछ", "अश्रु", "ससुर", "मशाल"], a: 0, t: "श्मश्रु (तत्सम) -> मूँछ (तद्भव)" },
+        { q: "किस भाषा का शब्द 'रिक्शा' है?", o: ["चीनी", "जापानी", "तुर्की", "रूसी"], a: 1, t: "रिक्शा जापानी भाषा का शब्द है।" },
+        { q: "'अट्टालिका' का तद्भव रूप है:", o: ["अटला", "अटल", "अटारी", "कमरा"], a: 2, t: "अट्टालिका (तत्सम) -> अटारी (तद्भव)" },
+        { q: "'गोमय' का तद्भव रूप बताइए:", o: ["गेहूँ", "गोबर", "गाय", "गंदा"], a: 1, t: "गोमय (तत्सम) -> गोबर (तद्भव)" },
+        { q: "निम्नलिखित में से 'विदेशी' शब्द है:", o: ["उष्ट्र", "अमीर", "प्रिय", "भक्त"], a: 1, t: "अमीर अरबी भाषा का शब्द है।" },
+        { q: "'खर्पर' का तद्भव रूप है:", o: ["खप्पर", "खिड़की", "खपड़ा", "खरगोश"], a: 2, t: "खर्पर (तत्सम) -> खपड़ा (तद्भव)" },
+        { q: "कौन-सा शब्द 'संकर' (Hybrid) है?", o: ["नारी", "रेलगाड़ी", "सूरज", "पेड़"], a: 1, t: "रेल (अंग्रेजी) + गाड़ी (हिंदी) = संकर शब्द" },
+        { q: "'हरिद्रा' का तद्भव रूप क्या है?", o: ["हरिद्वार", "हरदी", "हल्दी", "हलदर"], a: 2, t: "हरिद्रा (तत्सम) -> हल्दी (तद्भव)" },
+        { q: "'धूम्र' का तद्भव रूप बताइए:", o: ["धुँध", "धुआँ", "धूम", "धूल"], a: 1, t: "धूम्र (तत्सम) -> धुआँ (तद्भव)" },
+        { q: "निम्न में से तत्सम शब्द है:", o: ["कान", "मुँह", "जीभ", "मुख"], a: 3, t: "मुख (तत्सम) -> मुँह (तद्भव)" },
+        { q: "'गर्दभ' का तद्भव रूप है:", o: ["गधा", "गर्व", "गागर", "गौ"], a: 0, t: "गर्दभ (तत्सम) -> गधा (तद्भव)" },
+        { q: "'मक्षिका' का तद्भव रूप है:", o: ["मछली", "मक्खी", "मच्छर", "मिट्टी"], a: 1, t: "मक्षिका (तत्सम) -> मक्खी (तद्भव)" },
+        { q: "'आलपिन' और 'गमला' किस भाषा के शब्द हैं?", o: ["फ्रेंच", "पुर्तगाली", "अंग्रेजी", "जापानी"], a: 1, t: "आलपिन, गमला, तौलिया पुर्तगाली शब्द हैं।" },
+        { q: "'पर्यंक' का तद्भव रूप बताइए:", o: ["पलंग", "पानी", "पर्णा", "पार्क"], a: 0, t: "पर्यंक (तत्सम) -> पलंग (तद्भव)" },
+        { q: "किस शब्द में तत्सम-तद्भव का मेल अशुद्ध है?", o: ["दूध-दुग्ध", "हाथ-हस्त", "आम-आम्र", "दही-दधि"], a: 0, t: "विकल्प में तद्भव पहले और तत्सम बाद में है, क्रम अशुद्ध है।" },
+        { q: "'कैंची' किस भाषा का शब्द है?", o: ["हिंदी", "तुर्की", "अरबी", "फारसी"], a: 1, t: "कैंची, चाकू, तोप, कुली तुर्की शब्द हैं।" },
+        { q: "'क्षीर' का तद्भव रूप है:", o: ["खीर", "क्षेत्र", "खारी", "दूध"], a: 0, t: "क्षीर (तत्सम) -> खीर (तद्भव)" },
+        { q: "'उष्ट्र' का तद्भव रूप है:", o: ["ऊपर", "ऊँट", "उल्टा", "उजला"], a: 1, t: "उष्ट्र (तत्सम) -> ऊँट (तद्भव)" },
+        { q: "'पगड़ी' कैसा शब्द है?", o: ["तत्सम", "तद्भव", "देशज", "विदेशज"], a: 2, t: "पगड़ी एक स्थानीय देशज शब्द है।" },
+        { q: "'मृतिका' का तद्भव रूप है:", o: ["मौत", "मिट्टी", "मरना", "मीठा"], a: 1, t: "मृतिका (तत्सम) -> मिट्टी (तद्भव)" },
+        { q: "'लक्ष' का तद्भव रूप है:", o: ["लक्ष्य", "लखपति", "लाख", "लक्ष्मण"], a: 2, t: "लक्ष (तत्सम) -> लाख (तद्भव)" },
+        { q: "'वक' का तद्भव रूप बताइए:", o: ["बगुला", "वचन", "बंदर", "वायु"], a: 0, t: "वक (तत्सम) -> बगुला (तद्भव)" },
+        { q: "'कुक्कुर' का तद्भव रूप है:", o: ["कबूतर", "कुत्ता", "कौआ", "कीड़ा"], a: 1, t: "कुक्कुर (तत्सम) -> कुत्ता (तद्भव)" },
+        { q: "निम्न में से फारसी शब्द है:", o: ["आलमारी", "चश्मा", "कैंची", "कुली"], a: 1, t: "चश्मा फारसी भाषा का शब्द है।" },
+        { q: "'नारिकेल' का तद्भव रूप है:", o: ["नारी", "नारियल", "नया", "नाव"], a: 1, t: "नारिकेल (तत्सम) -> नारियल (तद्भव)" },
+        { q: "'हस्ती' का तद्भव रूप है:", o: ["हाथ", "हंसी", "हाथी", "हथियार"], a: 2, t: "हस्ती (तत्सम) -> हाथी (तद्भव)" },
+        { q: "'गोमल' और 'गोमय' का अर्थ है:", o: ["गेहूँ", "गोबर", "गुड़", "गाय"], a: 1, t: "दोनों तत्सम गोबर के लिए प्रयुक्त होते हैं।" },
+        { q: "'अद्य' का तद्भव रूप है:", o: ["आज", "आधा", "अंधेरा", "आगे"], a: 0, t: "अद्य (तत्सम) -> आज (तद्भव)" },
+        { q: "अरबी भाषा का शब्द पहचानिए:", o: ["अदालत", "पुलिस", "मेज", "काजू"], a: 0, t: "अदालत अरबी शब्द है।" },
+        { q: "'कपूर' शब्द कैसा है?", o: ["तत्सम", "तद्भव", "देशज", "विदेशज"], a: 1, t: "कपूर तद्भव है, इसका तत्सम 'कर्पूर' होता है।" },
+        { q: "'लोटा' शब्द किस श्रेणी में आता है?", o: ["तत्सम", "देशज", "तद्भव", "विदेशी"], a: 1, t: "लोटा देशज शब्द है।" },
+        { q: "'पुष्प' का तद्भव रूप है:", o: ["पत्ता", "फूल", "पौधा", "पुहुप"], a: 1, t: "पुष्प (तत्सम) -> फूल (तद्भव)" },
+        { q: "'चूर्ण' का तद्भव रूप है:", o: ["चोर", "चूर्ण", "चाम", "चूरन"], a: 3, t: "चूर्ण (तत्सम) -> चूरन (तद्भव)" },
+        { q: "'मयूर' का तद्भव रूप है:", o: ["मोदक", "मोर", "मामा", "मछली"], a: 1, t: "मयूर (तत्सम) -> मोर (तद्भव)" },
+        { q: "'तद्भव' शब्द का चयन कीजिए:", o: ["हस्त", "अग्नि", "निडर", "भ्रमर"], a: 2, t: "निडर तद्भव है, इसका तत्सम 'निर्भय' है।" },
+        { q: "'शैया' का तद्भव रूप है:", o: ["सोना", "सेम", "सेज", "सजना"], a: 2, t: "शैया (तत्सम) -> सेज (तद्भव)" },
+        { q: "तुर्की शब्द नहीं है:", o: ["चाकू", "तोप", "कमरा", "कुली"], a: 2, t: "कमरा पुर्तगाली शब्द है।" },
+        { q: "'अंधकार' का तद्भव रूप है:", o: ["अँधेरा", "रात", "साँझ", "धुआँ"], a: 0, t: "अंधकार (तत्सम) -> अँधेरा (तद्भव)" },
+        { q: "'कार्य' का तद्भव रूप है:", o: ["कर्म", "काम", "काज", "क्रिया"], a: 1, t: "कार्य (तत्सम) -> काम (तद्भव)" },
+        { q: "'भ्रमर' का तद्भव रूप है:", o: ["भँवरा", "भ्रमण", "भाला", "भईया"], a: 0, t: "भ्रमर (तत्सम) -> भँवरा (तद्भव)" },
+        { q: "'दधि' का तद्भव रूप है:", o: ["दूध", "दही", "दाँत", "दीप"], a: 1, t: "दधि (तत्सम) -> दही (तद्भव)" },
+        { q: "'श्रृंगार' का शुद्ध तत्सम रूप है:", o: ["शृंगार", "श्रृंगार", "सिंघार", "सज्जा"], a: 0, t: "शृंगार (शुद्ध तत्सम वर्तनी)" },
+        { q: "'चैत्र' का तद्भव रूप है:", o: ["चेत", "चैत", "चाँद", "चित्रा"], a: 1, t: "चैत्र (तत्सम) -> चैत (तद्भव)" },
+        { q: "'उज्ज्वल' का तद्भव रूप है:", o: ["उजला", "उजाला", "उज्वल", "सफ़ेद"], a: 0, t: "उज्ज्वल (तत्सम) -> उजला (तद्भव)" },
+        { q: "'वर्तिका' का तद्भव रूप है:", o: ["बत्ती", "बात", "बर्तन", "वर्ण"], a: 0, t: "वर्तिका (तत्सम) -> बत्ती (तद्भव)" },
+        { q: "पुर्तगाली शब्द पहचानिए:", o: ["बाल्टी", "चाकू", "कैंची", "टेलीफोन"], a: 0, t: "बाल्टी, तौलिया, मेज पुर्तगाली हैं।" },
+        { q: "'स्वर्ण' का तद्भव रूप है:", o: ["सोना", "सुनार", "सूरज", "स्वप्न"], a: 0, t: "स्वर्ण (तत्सम) -> सोना (तद्भव)" },
+        { q: "'अंगुष्ठ' का तद्भव रूप है:", o: ["अंगूठी", "अँगुली", "अंगूठा", "अंगोछा"], a: 2, t: "अंगुष्ठ (तत्सम) -> अंगूठा (तद्भव)" },
+        { q: "'मत्स्य' का तद्भव रूप है:", o: ["मच्छर", "मक्खी", "मछली", "मगर"], a: 2, t: "मत्स्य (तत्सम) -> मछली (तद्भव)" },
+        { q: "'यजमान' का तद्भव रूप है:", o: ["जजमान", "योगी", "जामुन", "जनता"], a: 0, t: "यजमान (तत्सम) -> जजमान (तद्भव)" },
+        { q: "'घोटक' का तद्भव रूप है:", o: ["घोड़ा", "घड़ा", "घर", "घायल"], a: 0, t: "घोटक (तत्सम) -> घोड़ा (तद्भव)" },
+        { q: "'ओष्ठ' का तद्भव रूप है:", o: ["ऊपर", "ओस", "ओठ", "ओंठ"], a: 2, t: "ओष्ठ (तत्सम) -> ओठ (तद्भव)" },
+        { q: "'छाया' का तद्भव रूप है:", o: ["छाँव", "धूप", "छत", "छाता"], a: 0, t: "छाया (तत्सम) -> छाँव (तद्भव)" },
+        { q: "'क्षीर' और 'खीर' में 'क्षीर' क्या है?", o: ["तद्भव", "देशज", "तत्सम", "विदेशी"], a: 2, t: "क्षीर तत्सम शब्द है।" },
+        { q: "चीनी भाषा का शब्द है:", o: ["चाय", "रिक्शा", "तोप", "समोसा"], a: 0, t: "चाय और लीची चीनी शब्द हैं।" },
+        { q: "'अग्नि' का तद्भव रूप है:", o: ["आग", "अगहन", "अंगारा", "आकाश"], a: 0, t: "अग्नि (तत्सम) -> आग (तद्भव)" },
+        { q: "'कपोत' का तद्भव रूप है:", o: ["कौआ", "कबूतर", "कोयल", "कीड़ा"], a: 1, t: "कपोत (तत्सम) -> कबूतर (तद्भव)" },
+        { q: "'क्षेत्र' का तद्भव रूप है:", o: ["खेत", "खारा", "छाती", "खेती"], a: 0, t: "क्षेत्र (तत्सम) -> खेत (तद्भव)" },
+        { q: "'कोकिल' का तद्भव रूप है:", o: ["कौआ", "कबूतर", "कोयल", "काग"], a: 2, t: "कोकिल (तत्सम) -> कोयल (तद्भव)" },
+        { q: "'गर्त' का तद्भव रूप है:", o: ["गधा", "गड्ढा", "गर्दन", "गलत"], a: 1, t: "गर्त (तत्सम) -> गड्ढा (तद्भव)" },
+        { q: "'चैत्र' का तद्भव रूप है:", o: ["चैत", "चेत", "चाँद", "चोर"], a: 0, t: "चैत्र (तत्सम) -> चैत (तद्भव)" },
+        { q: "'जिव्हा' का तद्भव रूप है:", o: ["जीभ", "जहर", "जीना", "जाल"], a: 0, t: "जिव्हा (तत्सम) -> जीभ (तद्भव)" },
+        { q: "'तैल' का तद्भव रूप है:", o: ["तिल", "तेल", "ताला", "तैरना"], a: 1, t: "तैल (तत्सम) -> तेल (तद्भव)" },
+        { q: "'दंत' का तद्भव रूप है:", o: ["दूध", "दाँत", "दाल", "दया"], a: 1, t: "दंत (तत्सम) -> दाँत (तद्भव)" },
+        { q: "'धैर्य' का तद्भव रूप है:", o: ["धीरज", "धूल", "धुआँ", "धनी"], a: 0, t: "धैर्य (तत्सम) -> धीरज (तद्भव)" },
+        { q: "'नग्न' का तद्भव रूप है:", o: ["नंगा", "नया", "नहर", "नाम"], a: 0, t: "नग्न (तत्सम) -> नंगा (तद्भव)" },
+        { q: "'पर्वत' का तद्भव रूप है:", o: ["पहाड़", "पत्थर", "पैर", "पूरा"], a: 0, t: "पर्वत (तत्सम) -> पहाड़ (तद्भव)" },
+        { q: "'बिन्दु' का तद्भव रूप है:", o: ["बिंदी", "बूंद", "बिंदु", "बेटा"], a: 1, t: "बिन्दु (तत्सम) -> बूंद (तद्भव)" },
+        { q: "'भ्राता' का तद्भव रूप है:", o: ["भाई", "भतीजा", "भगत", "भाला"], a: 0, t: "भ्राता (तत्सम) -> भाई (तद्भव)" },
+        { q: "'रात्रि' का तद्भव रूप है:", o: ["रात", "रैन", "शाम", "अंधेरा"], a: 0, t: "रात्रि (तत्सम) -> रात (तद्भव)" },
+        { q: "'लोह' का तद्भव रूप है:", o: ["लोहा", "लोहार", "लाल", "लौह"], a: 0, t: "लोह (तत्सम) -> लोहा (तद्भव)" },
+        { q: "'विवाह' का तद्भव रूप है:", o: ["ब्याह", "बारात", "बहू", "बेटा"], a: 0, t: "विवाह (तत्सम) -> ब्याह (तद्भव)" },
+        { q: "'शर्करा' का तद्भव रूप है:", o: ["शक्कर", "गुड़", "मिठाई", "चीनी"], a: 0, t: "शर्करा (तत्सम) -> शक्कर (तद्भव)" },
+        { q: "'सत्य' का तद्भव रूप है:", o: ["सच", "सही", "सच्चा", "सपूत"], a: 0, t: "सत्य (तत्सम) -> सच (तद्भव)" },
+        { q: "'हस्त' का तद्भव रूप है:", o: ["हाथ", "हंसी", "हाथी", "हथौड़ा"], a: 0, t: "हस्त (तत्सम) -> हाथ (तद्भव)" },
+        { q: "'क्षीर' का तद्भव रूप है:", o: ["खीर", "खेत", "खारा", "खाँसी"], a: 0, t: "क्षीर (तत्सम) -> खीर (तद्भव)" },
+        { q: "'घृणा' का तद्भव रूप है:", o: ["गिन", "घिन", "घायल", "घड़ा"], a: 1, t: "घृणा (तत्सम) -> घिन (तद्भव)" },
+        { q: "'चर्म' का तद्भव रूप है:", o: ["चमड़ा", "चमार", "चाँद", "चूना"], a: 0, t: "चर्म (तत्सम) -> चमड़ा (तद्भव)" },
+        { q: "'छत्र' का तद्भव रूप है:", o: ["छाता", "छत", "छाया", "छैला"], a: 1, t: "छत्र (तत्सम) -> छत (तद्भव)" },
+        { q: "'ज्येष्ठ' का तद्भव रूप है:", o: ["जेठ", "बड़ा", "जवान", "जुलाई"], a: 0, t: "ज्येष्ठ (तत्सम) -> जेठ (तद्भव)" },
+        { q: "'ताम्र' का तद्भव रूप है:", o: ["ताँबा", "तलवार", "तारा", "तालाब"], a: 0, t: "ताम्र (तत्सम) -> ताँबा (तद्भव)" },
+        { q: "'दुग्ध' का तद्भव रूप है:", o: ["दही", "दूध", "दाँत", "दीप"], a: 1, t: "दुग्ध (तत्सम) -> दूध (तद्भव)" },
+        { q: "'नक्षत्र' का तद्भव रूप है:", o: ["नख", "नखत", "तारा", "नाम"], a: 1, t: "नक्षत्र (तत्सम) -> नखत (तद्भव)" },
+        { q: "'पत्र' का तद्भव रूप है:", o: ["पत्ता", "पात्र", "पैर", "पक्षी"], a: 0, t: "पत्र (तत्सम) -> पत्ता (तद्भव)" },
+        { q: "'बालुका' का तद्भव रूप है:", o: ["बाल", "बालू", "बेटा", "बकरा"], a: 1, t: "बालुका (तत्सम) -> बालू (तद्भव)" },
+        { q: "'भिक्षा' का तद्भव रूप है:", o: ["भीख", "भगत", "भूखा", "भाई"], a: 0, t: "भिक्षा (तत्सम) -> भीख (तद्भव)" },
+        { q: "'मुख' का तद्भव रूप है:", o: ["मुँह", "मस्तक", "माथा", "मोर"], a: 0, t: "मुख (तत्सम) -> मुँह (तद्भव)" },
+        { q: "'लज्जा' का तद्भव रूप है:", o: ["लाज", "लड़ाई", "लाल", "लोहा"], a: 0, t: "लज्जा (तत्सम) -> लाज (तद्भव)" },
+        { q: "'शिक्षा' का तद्भव रूप है:", o: ["सीख", "पढ़ाई", "शिक्षक", "स्कूल"], a: 0, t: "शिक्षा (तत्सम) -> सीख (तद्भव)" },
+        { q: "'हृदय' का तद्भव रूप है:", o: ["हिया", "दिल", "छाती", "हाथ"], a: 0, t: "हृदय (तत्सम) -> हिया (तद्भव)" },
+        { q: "'श्रृंग' का तद्भव रूप है:", o: ["सींग", "शिखर", "सिर", "सजावट"], a: 0, t: "श्रृंग (तत्सम) -> सींग (तद्भव)" },
+        { q: "'ग्राहक' का तद्भव रूप है:", o: ["गौ", "गाहक", "गांव", "गधा"], a: 1, t: "ग्राहक (तत्सम) -> गाहक (तद्भव)" },
+        { q: "'दीप' का तद्भव रूप है:", o: ["दीया", "दिन", "दूध", "दाँत"], a: 0, t: "दीप (तत्सम) -> दीया (तद्भव)" },
+        { q: "'कज्जल' का तद्भव रूप है:", o: ["काजल", "काम", "कोयला", "कड़वा"], a: 0, t: "कज्जल (तत्सम) -> काजल (तद्भव)" }
     ];
 
-    // Generate pseudo-unique questions to fill 100
-    for(let i=25; i<100; i++) {
-        rawQuestions.push({
-            q: `प्रश्न संख्या ${i+1}: 'तद्भव' और 'तत्सम' के संदर्भ में शब्द भेद का अभ्यास प्रश्न।`,
-            o: ["विकल्प A", "विकल्प B", "विकल्प C", "विकल्प D"],
-            a: Math.floor(Math.random() * 4),
-            t: `यह प्रश्न ${i+1} का अभ्यास स्पष्टीकरण है।`
-        });
+    // Fixed Mixed Order Indices for Set A, B, C, D
+    const setOrders = {
+        'A': Array.from({length: 100}, (_, i) => i),
+        'B': Array.from({length: 100}, (_, i) => 99 - i),
+        'C': [14,82,3,91,55,21,7,66,40,0,12,88,4,73,50,29,19,95,6,31,77,44,11,85,2,38,60,93,17,45,28,70,99,53,8,84,33,1,54,89,20,68,96,15,43,26,72,51,87,35,9,64,30,81,18,63,97,42,13,86,34,58,25,79,16,49,71,32,59,83,47,76,92,10,24,65,56,41,74,37,69,94,22,57,80,36,61,90,52,78,46,23,67,14,5,75,98,39,27,62],
+        'D': [50,99,25,75,12,88,33,64,1,44,81,19,92,7,55,30,85,11,66,23,77,4,41,95,20,69,8,52,15,83,37,70,98,28,61,46,90,16,59,10,48,93,24,63,89,35,72,9,51,84,18,60,97,26,56,40,87,31,67,91,22,54,86,13,58,94,32,65,74,39,82,14,53,79,21,49,73,5,42,6,43,76,21,49,73,5,42,65,47,38,29,36,0,17,62,71,34,57,78,13]
+    };
+
+    let questions = [];
+    let score = 0;
+    let currentPage = 0;
+    const qPerPage = 25;
+    const userSelections = {};
+
+    function loadMixedSet(type) {
+        document.getElementById('menu-screen').style.display = 'none';
+        document.getElementById('main-container').style.display = 'block';
+        document.getElementById('quiz-title').innerText = `शब्द भेद टेस्ट: SET ${type}`;
+
+        const indices = setOrders[type];
+        questions = indices.map(idx => baseData[idx]);
+
+        renderPage(0);
     }
 
-    let currentSet = 'A';
-    let currentPage = 1;
-    let questionOrder = [];
-    let userAnswers = {}; // { index: selectedOption }
+    function renderPage(page) {
+        const list = document.getElementById('quiz-content');
+        list.innerHTML = "";
+        const start = page * qPerPage;
+        const end = start + qPerPage;
+        const pageQs = questions.slice(start, end);
 
-    // --- Core Logic ---
-
-    function startQuiz(set) {
-        currentSet = set;
-        document.getElementById('display-set').innerText = set;
-        generateFixedOrder(set);
-        document.getElementById('landing-screen').style.display = 'none';
-        document.getElementById('quiz-ui').style.display = 'block';
-        renderPage();
-    }
-
-    function generateFixedOrder(set) {
-        let baseIndices = Array.from(Array(100).keys());
-        if (set === 'A') questionOrder = baseIndices;
-        else if (set === 'B') questionOrder = baseIndices.reverse();
-        else if (set === 'C') {
-            // Interleave logic
-            questionOrder = [];
-            for(let i=0; i<50; i++) {
-                questionOrder.push(i*2);
-                questionOrder.push(i*2 + 1);
-            }
-            questionOrder.reverse();
-        } else {
-            // Fixed jump logic
-            questionOrder = [];
-            for(let i=0; i<100; i++) questionOrder.push((i * 7) % 100);
-            // Ensure uniqueness in D (rudimentary check)
-            let unique = [...new Set(questionOrder)];
-            while(unique.length < 100) {
-                for(let i=0; i<100; i++) if(!unique.includes(i)) unique.push(i);
-            }
-            questionOrder = unique;
-        }
-    }
-
-    function renderPage() {
-        const list = document.getElementById('question-list');
-        list.innerHTML = '';
-        window.scrollTo(0, 0);
-
-        const start = (currentPage - 1) * 25;
-        const end = start + 25;
-        const pageIndices = questionOrder.slice(start, end);
-
-        pageIndices.forEach((qIdx, localIdx) => {
-            const data = rawQuestions[qIdx];
+        pageQs.forEach((item, i) => {
+            const actualIdx = start + i;
             const card = document.createElement('div');
-            card.className = 'question-card';
-            
-            let optionsHtml = '';
-            data.o.forEach((opt, oIdx) => {
-                let statusClass = '';
-                let disabled = '';
-                
-                if (userAnswers.hasOwnProperty(qIdx)) {
-                    disabled = 'disabled';
-                    if (oIdx === data.a) statusClass = 'correct';
-                    else if (oIdx === userAnswers[qIdx] && oIdx !== data.a) statusClass = 'wrong';
-                }
-
-                optionsHtml += `
-                    <button class="opt-btn ${statusClass}" ${disabled} 
-                        onclick="handleSelect(${qIdx}, ${oIdx}, this)">
-                        ${opt}
-                    </button>`;
-            });
-
-            const isAnswered = userAnswers.hasOwnProperty(qIdx);
-
+            card.className = 'q-card';
             card.innerHTML = `
-                <div class="question-text">${start + localIdx + 1}. ${data.q}</div>
-                <div class="options-grid">${optionsHtml}</div>
-                <div class="explanation" id="exp-${qIdx}" style="display: ${isAnswered ? 'block' : 'none'}">
-                    <strong>व्याख्या:</strong> ${data.t}
+                <div class="q-text">${actualIdx + 1}. ${item.q}</div>
+                <div class="options" id="opt-${actualIdx}">
+                    ${item.o.map((opt, oi) => `<button class="opt-btn" onclick="check(${actualIdx}, ${oi}, this)">${opt}</button>`).join('')}
                 </div>
+                <div class="feedback" id="feed-${actualIdx}"></div>
             `;
             list.appendChild(card);
+            if (userSelections[actualIdx] !== undefined) restore(actualIdx, userSelections[actualIdx]);
         });
 
-        updateStats();
+        document.getElementById('pageDisplay').innerText = `पेज: ${page + 1} / 4`;
+        document.getElementById('prevBtn').disabled = (page === 0);
+        document.getElementById('nextBtn').disabled = (page === 3);
+        window.scrollTo(0,0);
     }
 
-    function handleSelect(qIdx, oIdx, btn) {
-        if (userAnswers.hasOwnProperty(qIdx)) return;
-
-        userAnswers[qIdx] = oIdx;
-        const data = rawQuestions[qIdx];
-        const buttons = btn.parentElement.querySelectorAll('.opt-btn');
+    function check(qIdx, selIdx, btn) {
+        const item = questions[qIdx];
+        const buttons = document.getElementById(`opt-${qIdx}`).querySelectorAll('button');
+        const feed = document.getElementById(`feed-${qIdx}`);
         
-        buttons.forEach((b, idx) => {
-            b.disabled = true;
-            if (idx === data.a) b.classList.add('correct');
-            else if (idx === oIdx) b.classList.add('wrong');
-        });
+        userSelections[qIdx] = selIdx;
+        buttons.forEach(b => b.disabled = true);
 
-        document.getElementById(`exp-${qIdx}`).style.display = 'block';
-        updateStats();
+        if (selIdx === item.a) {
+            btn.classList.add('correct');
+            score++;
+            feed.innerHTML = `✅ सही उत्तर! <br> [${item.t}]`;
+            feed.style.color = "green";
+        } else {
+            btn.classList.add('wrong');
+            buttons[item.a].classList.add('correct');
+            feed.innerHTML = `❌ गलत। सही जवाब है: <b>${item.o[item.a]}</b> <br> [${item.t}]`;
+            feed.style.color = "red";
+        }
+        feed.style.display = "block";
+        document.getElementById('scoreDisplay').innerText = `स्कोर: ${score} / 100`;
     }
 
-    function updateStats() {
-        let score = 0;
-        Object.keys(userAnswers).forEach(idx => {
-            if (userAnswers[idx] === rawQuestions[idx].a) score++;
-        });
-
-        document.getElementById('score-val').innerText = score;
-        document.getElementById('page-val').innerText = currentPage;
-        document.getElementById('prev-btn').disabled = currentPage === 1;
-        document.getElementById('next-btn').disabled = currentPage === 4;
+    function restore(qIdx, selIdx) {
+        const item = questions[qIdx];
+        const buttons = document.getElementById(`opt-${qIdx}`).querySelectorAll('button');
+        const feed = document.getElementById(`feed-${qIdx}`);
+        buttons.forEach(b => b.disabled = true);
+        if (selIdx === item.a) {
+            buttons[selIdx].classList.add('correct');
+            feed.innerHTML = `✅ सही! <br> [${item.t}]`;
+        } else {
+            buttons[selIdx].classList.add('wrong');
+            buttons[item.a].classList.add('correct');
+            feed.innerHTML = `❌ गलत। सही: <b>${item.o[item.a]}</b> <br> [${item.t}]`;
+        }
+        feed.style.display = "block";
     }
 
-    function changePage(step) {
-        currentPage += step;
-        renderPage();
+    function changePage(dir) {
+        currentPage += dir;
+        renderPage(currentPage);
     }
 </script>
 
 </body>
 </html>
+
 
