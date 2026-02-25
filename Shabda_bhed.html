@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>हिंदी व्याकरण क्विज़: शब्द भेद एवं तत्सम-तद्भव</title>
+    <style>
+        :root {
+            --primary-color: #2c3e50;
+            --secondary-color: #34495e;
+            --accent-color: #e74c3c;
+            --success-color: #27ae60;
+            --bg-color: #ecf0f1;
+            --box-bg: #ffffff;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--primary-color);
+            margin: 0;
+            padding: 20px;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: var(--box-bg);
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+
+        h1 {
+            text-align: center;
+            color: var(--primary-color);
+            border-bottom: 2px solid var(--accent-color);
+            padding-bottom: 10px;
+        }
+
+        .set-selector {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+        }
+
+        .set-btn {
+            padding: 10px 20px;
+            font-size: 16px;
+            font-weight: bold;
+            background-color: var(--secondary-color);
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+
+        .set-btn:hover, .set-btn.active {
+            background-color: var(--accent-color);
+        }
+
+        .question-container {
+            margin-bottom: 25px;
+            padding: 15px;
+            background: #f9f9f9;
+            border-left: 4px solid var(--secondary-color);
+            border-radius: 4px;
+        }
+
+        .question {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 15px;
+        }
+
+        .options {
+            list-style: none;
+            padding: 0;
+        }
+
+        .options li {
+            margin-bottom: 10px;
+        }
+
+        .options label {
+            display: flex;
+            align-items: center;
+            padding: 10px;
+            background: var(--box-bg);
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .options label:hover {
+            background: #eef2f5;
+        }
+
+        .options input[type="radio"] {
+            margin-right: 15px;
+            transform: scale(1.2);
+        }
+
+        .submit-btn {
+            display: block;
+            width: 100%;
+            padding: 15px;
+            font-size: 18px;
+            background-color: var(--success-color);
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-top: 20px;
+            font-weight: bold;
+        }
+
+        .submit-btn:hover {
+            background-color: #219a52;
+        }
+
+        #result {
+            margin-top: 25px;
+            padding: 20px;
+            font-size: 20px;
+            font-weight: bold;
+            text-align: center;
+            border-radius: 5px;
+            display: none;
+        }
+
+        .correct-answer {
+            background-color: #d4edda !important;
+            border-color: #c3e6cb !important;
+            color: #155724;
+        }
+
+        .wrong-answer {
+            background-color: #f8d7da !important;
+            border-color: #f5c6cb !important;
+            color: #721c24;
+        }
+        
+        #quiz-area {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>व्याकरण क्विज़: शब्द भेद एवं तत्सम-तद्भव</h1>
+    <p style="text-align: center;">अपनी तैयारी जाँचने के लिए कोई एक सेट चुनें:</p>
+
+    <div class="set-selector">
+        <button class="set-btn" onclick="loadSet(0)">सेट 1 (मध्यम)</button>
+        <button class="set-btn" onclick="loadSet(1)">सेट 2 (शब्द भेद)</button>
+        <button class="set-btn" onclick="loadSet(2)">सेट 3 (उच्च स्तर)</button>
+        <button class="set-btn" onclick="loadSet(3)">सेट 4 (मिश्रित)</button>
+    </div>
+
+    <div id="quiz-area">
+        <div id="questions-box"></div>
+        <button class="submit-btn" onclick="calculateScore()">परिणाम देखें</button>
+        <div id="result"></div>
+    </div>
+</div>
+
+<script>
+    const quizData = [
+        // Set 1
+        [
+            { q: "'आँसू' का तत्सम रूप क्या है?", options: ["अश्रु", "अक्षि", "चक्षु", "अशिर"], ans: 0 },
+            { q: "निम्नलिखित में से तत्सम शब्द छाँटिए।", options: ["उबटन", "उद्वर्तन", "ऊँट", "ऊँचा"], ans: 1 },
+            { q: "'गोमय' का तद्भव रूप क्या है?", options: ["गोत्र", "गाय", "गोबर", "गेंहूँ"], ans: 2 },
+            { q: "'मक्षिका' किसका तत्सम रूप है?", options: ["मछली", "मक्खी", "मच्छर", "मिट्टी"], ans: 1 },
+            { q: "निम्नलिखित में से कौन-सा शब्द तद्भव है?", options: ["भ्रमर", "व्याघ्र", "क्षीर", "भँवरा"], ans: 3 }
+        ],
+        // Set 2
+        [
+            { q: "'दशानन' किस प्रकार का शब्द है?", options: ["रूढ़", "यौगिक", "योगरूढ़", "इनमें से कोई नहीं"], ans: 2 },
+            { q: "जिन शब्दों के सार्थक खण्ड न हो सकें, उन्हें क्या कहते हैं?", options: ["रूढ़", "यौगिक", "योगरूढ़", "अव्यय"], ans: 0 },
+            { q: "'विद्यालय' किस प्रकार का शब्द है?", options: ["रूढ़", "यौगिक", "योगरूढ़", "देशज"], ans: 1 },
+            { q: "'रेलगाड़ी' शब्द किस श्रेणी में आता है?", options: ["देशज", "विदेशज", "संकर", "तत्सम"], ans: 2 },
+            { q: "पंकज, जलज आदि किस प्रकार के शब्द हैं?", options: ["रूढ़", "यौगिक", "योगरूढ़", "मिश्रित"], ans: 2 }
+        ],
+        // Set 3
+        [
+            { q: "'अखरोट' का तत्सम रूप क्या है?", options: ["अक्षवट", "अक्षावट", "अक्षोट", "अखरोट"], ans: 2 },
+            { q: "इनमें से कौन सा युग्म (तद्भव-तत्सम) सही नहीं है?", options: ["ओझा - उपाध्याय", "केला - कदली", "कपास - कर्पट", "पसीना - प्रस्विन्न"], ans: 2 },
+            { q: "'पलंग' का तत्सम रूप है?", options: ["प्लवंग", "परमंग", "पर्यंक", "पटल"], ans: 2 },
+            { q: "'कठहरा' का तत्सम रूप क्या है?", options: ["कंठहार", "काष्ठगृह", "कटुगृह", "कड़वा"], ans: 1 },
+            { q: "'अकार्य' का तद्भव रूप क्या होगा?", options: ["अकाम", "आकाज", "अकाज", "इनमें से कोई नहीं"], ans: 2 }
+        ],
+        // Set 4
+        [
+            { q: "निम्नलिखित में से कौन सा शब्द देशज है?", options: ["अग्नि", "लोटा", "प्रार्थना", "खेत"], ans: 1 },
+            { q: "'रिक्शा' किस भाषा का शब्द है?", options: ["चीनी", "रूसी", "जापानी", "फ़्रांसीसी"], ans: 2 },
+            { q: "'अलमारी' किस विदेशी भाषा का शब्द है?", options: ["अंग्रेज़ी", "पुर्तगाली", "अरबी", "फ़ारसी"], ans: 1 },
+            { q: "जिन शब्दों में लिंग, वचन और कारक के कारण विकार उत्पन्न होता है, वे कहलाते हैं?", options: ["अविकारी", "विकारी", "अव्यय", "निपात"], ans: 1 },
+            { q: "'धीरे-धीरे' व्याकरण की दृष्टि से क्या है?", options: ["संज्ञा", "सर्वनाम", "क्रिया", "अव्यय"], ans: 3 }
+        ]
+    ];
+
+    let currentSetIndex = -1;
+
+    function loadSet(index) {
+        currentSetIndex = index;
+        const quizArea = document.getElementById('quiz-area');
+        const questionsBox = document.getElementById('questions-box');
+        const resultBox = document.getElementById('result');
+        const buttons = document.querySelectorAll('.set-btn');
+
+        // Update active button styling
+        buttons.forEach((btn, i) => {
+            btn.classList.toggle('active', i === index);
+        });
+
+        // Reset UI
+        resultBox.style.display = 'none';
+        quizArea.style.display = 'block';
+        questionsBox.innerHTML = '';
+
+        // Generate questions HTML
+        const questions = quizData[index];
+        questions.forEach((qObj, qIndex) => {
+            const qDiv = document.createElement('div');
+            qDiv.className = 'question-container';
+            qDiv.id = `q-container-${qIndex}`;
+
+            let optionsHtml = '<ul class="options">';
+            qObj.options.forEach((opt, optIndex) => {
+                optionsHtml += `
+                    <li>
+                        <label id="label-${qIndex}-${optIndex}">
+                            <input type="radio" name="q${qIndex}" value="${optIndex}">
+                            ${opt}
+                        </label>
+                    </li>
+                `;
+            });
+            optionsHtml += '</ul>';
+
+            qDiv.innerHTML = `<div class="question">प्रश्न ${qIndex + 1}: ${qObj.q}</div>${optionsHtml}`;
+            questionsBox.appendChild(qDiv);
+        });
+    }
+
+    function calculateScore() {
+        if (currentSetIndex === -1) return;
+
+        const questions = quizData[currentSetIndex];
+        let score = 0;
+        let allAnswered = true;
+
+        questions.forEach((qObj, qIndex) => {
+            const selectedOption = document.querySelector(`input[name="q${qIndex}"]:checked`);
+            
+            if (!selectedOption) {
+                allAnswered = false;
+            } else {
+                const selectedVal = parseInt(selectedOption.value);
+                
+                // Reset styling for all options in this question
+                qObj.options.forEach((_, optIndex) => {
+                    document.getElementById(`label-${qIndex}-${optIndex}`).classList.remove('correct-answer', 'wrong-answer');
+                });
+
+                // Apply styling based on correctness
+                if (selectedVal === qObj.ans) {
+                    score++;
+                    document.getElementById(`label-${qIndex}-${selectedVal}`).classList.add('correct-answer');
+                } else {
+                    document.getElementById(`label-${qIndex}-${selectedVal}`).classList.add('wrong-answer');
+                    // Highlight the correct answer as well
+                    document.getElementById(`label-${qIndex}-${qObj.ans}`).classList.add('correct-answer');
+                }
+            }
+        });
+
+        const resultBox = document.getElementById('result');
+        resultBox.style.display = 'block';
+
+        if (!allAnswered) {
+            resultBox.innerHTML = "कृपया सभी प्रश्नों के उत्तर दें!";
+            resultBox.style.backgroundColor = "#fff3cd";
+            resultBox.style.color = "#856404";
+            resultBox.style.border = "1px solid #ffeeba";
+        } else {
+            resultBox.innerHTML = `आपका स्कोर: ${score} / ${questions.length}`;
+            if (score === questions.length) {
+                resultBox.style.backgroundColor = "#d4edda";
+                resultBox.style.color = "#155724";
+            } else if (score >= questions.length / 2) {
+                resultBox.style.backgroundColor = "#cce5ff";
+                resultBox.style.color = "#004085";
+            } else {
+                resultBox.style.backgroundColor = "#f8d7da";
+                resultBox.style.color = "#721c24";
+            }
+        }
+    }
+</script>
+
+</body>
+</html>
