@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GitHub JSON Quiz Master</title>
+    <style>
+        :root {
+            --primary: #2c3e50;
+            --accent: #d35400;
+            --success: #27ae60;
+            --danger: #c0392b;
+            --bg: #f1f2f6;
+        }
+        body { font-family: 'Segoe UI', Arial, sans-serif; background-color: var(--bg); margin: 0; padding: 10px; }
+        
+        /* Overlays */
+        .overlay {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: var(--primary);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 2000;
+            color: white;
+            text-align: center;
+        }
+        .menu-box {
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            color: #333;
+            width: 90%;
+            max-width: 500px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+        }
+        .btn-list { max-height: 300px; overflow-y: auto; margin-top: 20px; }
+        
+        /* Buttons */
+        .btn {
+            display: block; width: 100%; padding: 15px; margin: 10px 0;
+            font-size: 1.1em; font-weight: bold; border: none; border-radius: 8px;
+            cursor: pointer; transition: 0.3s;
+        }
+        .file-btn { background: #3498db; color: white; }
+        .set-btn { background: #8e44ad; color: white; display: inline-block; width: 45%; margin: 5px; }
+        .btn:hover { opacity: 0.9; transform: scale(1.02); }
+
+        /* Quiz UI */
+        .container { max-width: 850px; margin: 0 auto; background: white; padding: 25px; border-radius: 15px; display: none; }
+        header { text-align: center; border-bottom: 3px solid var(--accent); margin-bottom: 20px; padding-bottom: 10px; }
+        .stats-bar { position: sticky; top: 10px; z-index: 1000; display: flex; justify-content: space-between; background: var(--primary); color: white; padding: 15px 20px; border-radius: 10px; margin-bottom: 20px; font-weight: bold; }
+        .q-card { background: #fff; border: 1px solid #ddd; border-radius: 10px; padding: 20px; margin-bottom: 20px; border-left: 6px solid var(--accent); }
+        .q-text { font-size: 1.15em; font-weight: 700; margin-bottom: 15px; color: #2c3e50; }
+        .options { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+        @media (max-width: 600px) { .options { grid-template-columns: 1fr; } }
+        button.opt-btn { padding: 12px; border: 1px solid #dee2e6; background: #fff; border-radius: 6px; cursor: pointer; text-align: left; }
+        button.correct { background: #d4edda !important; color: #155724; font-weight: bold; }
+        button.wrong { background: #f8d7da !important; color: #721c24; }
+        .feedback { margin-top: 12px; display: none; font-weight: 600; padding: 12px; border-radius: 5px; background: #f1f2f6; border-left: 4px solid var(--accent); line-height: 1.6; }
+        .pagination { display: flex; justify-content: center; gap: 15px; margin-top: 30px; border-top: 2px solid #eee; padding-top: 20px; }
+        .nav-btn { padding: 10px 30px; background: var(--accent); color: white; border: none; border-radius: 5px; cursor: pointer; font-weight: bold; }
+    </style>
+</head>
+<body>
+
+<div id="topic-screen" class="overlay">
+    <div class="menu-box">
+        <h2 id="loading-msg">प्रश्नावली लोड हो रही है...</h2>
+        <div id="file-list" class="btn-list"></div>
+    </div>
+</div>
+
+<div id="set-screen" class="overlay" style="display: none;">
+    <div class="menu-box">
+        <h2>सेट चुनें</h2>
+        <p id="selected-topic-name"></p>
+        <button class="btn set-btn" onclick="applySet('A')">Set A</button>
+        <button class="btn set-btn" onclick="applySet('B')">Set B</button>
+        <button class="btn set-btn" onclick="applySet('C')">Set C</button>
+        <button class="btn set-btn" onclick="applySet('D')">Set D</button>
+    </div>
+</div>
+
+<div class="container" id="quiz-container">
+    <header>
+        <h1 id="quiz-title">क्विज़</h1>
+        <div id="exam-tag-display" style="color: #7f8c8d; font-weight: bold;"></div>
+    </header>
+
+    <div class="stats-bar">
+        <div id="scoreDisplay">स्कोर: 0</div>
+        <div id="pageDisplay">पेज: 1</div>
+    </div>
+
+    <div id="quiz-content"></div>
+
+    <div class="pagination">
+        <button class="nav-btn" id="prevBtn" onclick="changePage(-1)">पिछला</button>
+        <button class="nav-btn" id="nextBtn" onclick="changePage(1)">अगला</button>
+    </div>
+</div>
+
+<script>
+    // --- कॉन्फ़िगरेशन ---
+    const GITHUB_USER = 'YOUR_USERNAME'; 
+    const GITHUB_REPO = 'YOUR_REPO_NAME';
+    const FOLDER_PATH = 'data'; // आपके JSON फाइलों का फोल्डर
+
+    let rawData = [];      // GitHub से आया हुआ ओरिजिनल डेटा
+    let quizQuestions = []; // सेट के हिसाब से अरेंज किया डेटा
+    let userSelections = {};
+    let score = 0;
+    let currentPage = 0;
+    const qPerPage = 25;
+
+    // 1. GitHub API से फ़ाइलें स्कैन करें
+    async function scanFiles() {
+        const url = `https://api.github.com/repos/${GITHUB_USER}/${GITHUB_REPO}/contents/${FOLDER_PATH}`;
+        try {
+            const res = await fetch(url);
+            const files = await res.json();
+            const jsonFiles = files.filter(f => f.name.endsWith('.json'));
+            
+            const listDiv = document.getElementById('file-list');
+            document.getElementById('loading-msg').innerText = "विषय चुनें:";
+            
+            jsonFiles.forEach(file => {
+                const btn = document.createElement('button');
+                btn.className = 'btn file-btn';
+                btn.innerText = file.name.replace('.json', '').toUpperCase();
+                btn.onclick = () => fetchQuestions(file.download_url, file.name);
+                listDiv.appendChild(btn);
+            });
+        } catch (e) {
+            document.getElementById('loading-msg').innerText = "GitHub से कनेक्ट करने में विफल!";
+        }
+    }
+
+    // 2. चयनित JSON डाउनलोड करें और मैप करें
+    async function fetchQuestions(url, name) {
+        document.getElementById('topic-screen').style.display = 'none';
+        document.getElementById('set-screen').style.display = 'flex';
+        document.getElementById('selected-topic-name').innerText = "विषय: " + name;
+        
+        try {
+            const res = await fetch(url);
+            const json = await res.json();
+            
+            // आपके कस्टम JSON फॉर्मेट को मैप करना
+            rawData = json.map(item => ({
+                q: item.question,
+                o: [item.options.a, item.options.b, item.options.c, item.options.d],
+                a: item.answer.toLowerCase().charCodeAt(0) - 97, // 'a'->0, 'b'->1 etc
+                t: item.explanation,
+                tag: item.exam_tag
+            }));
+        } catch (e) { alert("Error loading JSON!"); }
+    }
+
+    // 3. फिक्स्ड मिक्स सेट लॉजिक लागू करें
+    function applySet(set) {
+        document.getElementById('set-screen').style.display = 'none';
+        document.getElementById('quiz-container').style.display = 'block';
+        
+        const count = rawData.length;
+        let indices = Array.from({length: count}, (_, i) => i);
+
+        // अलग-अलग फिक्स्ड ऑर्डर
+        if (set === 'B') indices.reverse();
+        if (set === 'C') {
+            let odd = indices.filter(i => i % 2 !== 0);
+            let even = indices.filter(i => i % 2 === 0);
+            indices = odd.concat(even);
+        }
+        if (set === 'D') {
+            // Jump by 3 logic for D
+            let dIndices = [];
+            for(let i=0; i<count; i++) dIndices.push((i * 3) % count);
+            indices = [...new Set(dIndices)];
+            // Fill remaining if any
+            Array.from({length: count}, (_, i) => i).forEach(i => {
+                if(!indices.includes(i)) indices.push(i);
+            });
+        }
+
+        quizQuestions = indices.map(idx => rawData[idx]);
+        renderPage(0);
+    }
+
+    function renderPage(page) {
+        const content = document.getElementById('quiz-content');
+        content.innerHTML = "";
+        const start = page * qPerPage;
+        const end = Math.min(start + qPerPage, quizQuestions.length);
+        const pageData = quizQuestions.slice(start, end);
+
+        pageData.forEach((item, i) => {
+            const idx = start + i;
+            const card = document.createElement('div');
+            card.className = 'q-card';
+            card.innerHTML = `
+                <div class="q-text">${idx + 1}. ${item.q}</div>
+                <div class="options" id="opts-${idx}">
+                    ${item.o.map((opt, oi) => `<button class="opt-btn" onclick="checkAnswer(${idx}, ${oi}, this)">${opt}</button>`).join('')}
+                </div>
+                <div class="feedback" id="feed-${idx}"></div>
+            `;
+            content.appendChild(card);
+            if (userSelections[idx] !== undefined) restoreState(idx);
+        });
+
+        document.getElementById('pageDisplay').innerText = `पेज: ${page + 1}`;
+        document.getElementById('prevBtn').disabled = (page === 0);
+        document.getElementById('nextBtn').disabled = (end >= quizQuestions.length);
+        window.scrollTo(0,0);
+    }
+
+    function checkAnswer(qIdx, selIdx, btn) {
+        const item = quizQuestions[qIdx];
+        const buttons = document.getElementById(`opts-${qIdx}`).querySelectorAll('button');
+        const feed = document.getElementById(`feed-${qIdx}`);
+        
+        userSelections[qIdx] = selIdx;
+        buttons.forEach(b => b.disabled = true);
+
+        if (selIdx === item.a) {
+            btn.classList.add('correct');
+            score++;
+        } else {
+            btn.classList.add('wrong');
+            buttons[item.a].classList.add('correct');
+        }
+        
+        feed.innerHTML = `<strong>उत्तर व्याख्या:</strong><br>${item.t}`;
+        feed.style.display = "block";
+        document.getElementById('scoreDisplay').innerText = `स्कोर: ${score}`;
+    }
+
+    function restoreState(idx) {
+        const selIdx = userSelections[idx];
+        const item = quizQuestions[idx];
+        const buttons = document.getElementById(`opts-${idx}`).querySelectorAll('button');
+        const feed = document.getElementById(`feed-${idx}`);
+        
+        buttons.forEach(b => b.disabled = true);
+        if (selIdx === item.a) buttons[selIdx].classList.add('correct');
+        else {
+            buttons[selIdx].classList.add('wrong');
+            buttons[item.a].classList.add('correct');
+        }
+        feed.innerHTML = `<strong>उत्तर व्याख्या:</strong><br>${item.t}`;
+        feed.style.display = "block";
+    }
+
+    function changePage(dir) {
+        currentPage += dir;
+        renderPage(currentPage);
+    }
+
+    // App Start
+    scanFiles();
+</script>
+</body>
+</html>
