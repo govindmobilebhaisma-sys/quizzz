@@ -1,0 +1,391 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>बाल विकास एवं शिक्षाशास्त्र क्विज़</title>
+    <style>
+        :root {
+            --primary: #2c3e50;
+            --accent: #d35400;
+            --success: #27ae60;
+            --danger: #c0392b;
+            --bg: #f4f7f6;
+        }
+        body { font-family: 'Segoe UI', Arial, sans-serif; background-color: var(--bg); margin: 0; padding: 10px; color: #333; }
+        
+        /* Selection Menu */
+        #menu-screen {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: var(--primary);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 2000;
+            color: white;
+        }
+        .menu-box {
+            background: white;
+            padding: 40px;
+            border-radius: 20px;
+            text-align: center;
+            color: #333;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.4);
+            max-width: 450px;
+            width: 90%;
+        }
+        .set-btn {
+            display: block;
+            width: 100%;
+            padding: 15px;
+            margin: 10px 0;
+            font-size: 1.2em;
+            font-weight: bold;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: 0.3s;
+            color: white;
+        }
+        .btn-a { background: #3498db; }
+        .btn-b { background: #9b59b6; }
+        .btn-c { background: #27ae60; }
+        .btn-d { background: #e67e22; }
+        .set-btn:hover { transform: scale(1.03); filter: brightness(1.1); }
+
+        /* Quiz UI */
+        .container { max-width: 850px; margin: 0 auto; background: white; padding: 25px; border-radius: 15px; display: none; box-shadow: 0 5px 20px rgba(0,0,0,0.05); }
+        header { text-align: center; border-bottom: 3px solid var(--accent); margin-bottom: 20px; padding-bottom: 10px; }
+        .stats-bar { position: sticky; top: 10px; z-index: 1000; display: flex; justify-content: space-between; background: var(--primary); color: white; padding: 15px 20px; border-radius: 10px; margin-bottom: 20px; font-weight: bold; box-shadow: 0 4px 10px rgba(0,0,0,0.2); }
+        .q-card { background: #fff; border: 1px solid #ddd; border-radius: 10px; padding: 20px; margin-bottom: 20px; border-left: 6px solid var(--accent); }
+        .q-text { font-size: 1.15em; font-weight: 700; margin-bottom: 15px; color: #2c3e50; line-height: 1.5; }
+        .options { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+        @media (max-width: 600px) { .options { grid-template-columns: 1fr; } }
+        button.opt-btn { padding: 12px; border: 1px solid #dee2e6; background: #fff; border-radius: 6px; cursor: pointer; text-align: left; font-size: 1em; }
+        button.correct { background: #d4edda !important; color: #155724; font-weight: bold; border-color: var(--success); }
+        button.wrong { background: #f8d7da !important; color: #721c24; border-color: var(--danger); }
+        .feedback { margin-top: 12px; display: none; font-weight: 600; padding: 10px; border-radius: 5px; background: #f1f2f6; border-left: 4px solid var(--accent); line-height: 1.5; }
+        .pagination { display: flex; justify-content: center; gap: 15px; margin-top: 30px; border-top: 2px solid #eee; padding-top: 20px; }
+        .nav-btn { padding: 10px 30px; background: var(--accent); color: white; border: none; border-radius: 5px; cursor: pointer; font-weight: bold; }
+        .nav-btn:disabled { background: #ccc; cursor: not-allowed; }
+    </style>
+</head>
+<body>
+
+<div id="menu-screen">
+    <div class="menu-box">
+        <h2 style="margin-top:0">बाल विकास एवं शिक्षाशास्त्र (CDP)</h2>
+        <p>अभिवृद्धि एवं विकास | महत्वपूर्ण अभ्यास प्रश्न<br>कृपया अपना सेट चुनें:</p>
+        <button class="set-btn btn-a" onclick="loadSet('A')">SET A</button>
+        <button class="set-btn btn-b" onclick="loadSet('B')">SET B</button>
+        <button class="set-btn btn-c" onclick="loadSet('C')">SET C</button>
+        <button class="set-btn btn-d" onclick="loadSet('D')">SET D</button>
+    </div>
+</div>
+
+<div class="container" id="main-container">
+    <header>
+        <h1 id="quiz-title">बाल विकास एवं शिक्षाशास्त्र क्विज़</h1>
+        <p>अभिवृद्धि और विकास के सिद्धांत एवं आयाम</p>
+    </header>
+    <div class="stats-bar">
+        <div id="scoreDisplay">कुल स्कोर: 0 / 25</div>
+        <div id="pageDisplay">पेज: 1 / 1</div>
+    </div>
+    <div id="quiz-content"></div>
+    <div class="pagination">
+        <button class="nav-btn" id="prevBtn" onclick="changePage(-1)" disabled>पिछला</button>
+        <button class="nav-btn" id="nextBtn" onclick="changePage(1)" disabled>अगला</button>
+    </div>
+</div>
+
+<script>
+    const questionsPool = [
+        {
+            q: "बालकों की अभिवृद्धि एवं विकास में “अभिवृद्धि” शब्द बालकों के व्यक्तित्व के किस चरण से संबंधित है?",
+            o: ["मानसिक", "शारीरिक", "चारित्रिक", "संवेगात्मक"],
+            a: 1,
+            t: "शारीरिक वृद्धि एवं विकास को अभिवृद्धि कहा जाता है। बालकों में अभिवृद्धि शब्द व्यक्तित्व के शारीरिक चरण से संबंधित है।"
+        },
+        {
+            q: "विकास के संदर्भ में कौन-सा/से कथन सत्य नहीं है?<br><small>(a) विकास की प्रत्येक अवस्था में अनेक खतरे हैं।<br>(b) विकास उकसाने या बढ़ावा देने से नहीं होता।<br>(c) विकास सांस्कृतिक परिवर्तनों से नहीं होता है।<br>(d) विकास की प्रत्येक अवस्था की अपनी विशेषताएँ हैं।</small>",
+            o: ["a और b", "b और c", "a और c", "b और d"],
+            a: 1,
+            t: "विकास उकसाने या बढ़ावा देने से नहीं बल्कि स्वाभाविक व उचित वातावरण से होता है, तथा विकास सांस्कृतिक परिवर्तनों से प्रभावित होता है। अतः b और c सत्य नहीं हैं।"
+        },
+        {
+            q: "वृद्धि और विकास की प्रक्रियाओं के लिए निम्न में से कौन-सा कथन सही है?",
+            o: [
+                "दोनों स्वाभाविक प्रक्रिया हैं।",
+                "विकास स्वाभाविक है जबकि वृद्धि के लिए बाहरी हस्तक्षेप की आवश्यकता होती है।",
+                "यदि वृद्धि संतोषजनक है तो विकास अनुसरण करता है।",
+                "दोनों प्रक्रियाएँ बिना किसी बाहरी हस्तक्षेप के एक साथ चलती हैं।"
+            ],
+            a: 0,
+            t: "वृद्धि एवं विकास दोनों ही स्वाभाविक (प्राकृतिक) प्रक्रियाएँ हैं। वृद्धि मात्रात्मक तथा विकास गुणात्मक परिवर्तनों से संबंधित है।"
+        },
+        {
+            q: "बालकों के विकास के संदर्भ में निम्न में से कौन-सा/से कथन सत्य है?<br><small>(a) विकास की गति बालक-बालिकाओं में एकसमान होती है।<br>(b) विकास सामान्य से विशिष्ट की ओर अग्रसर होता है।<br>(c) विकास सतत् चलने वाली प्रक्रिया है।<br>(d) विकास केवल आनुवांशिकी का परिणाम है।</small>",
+            o: ["a और b", "b और c", "b और d", "a और c"],
+            a: 1,
+            t: "विकास की गति में वैयक्तिक विभिन्नता होती है तथा विकास वंशानुक्रम एवं वातावरण की अंतःक्रिया का परिणाम होता है। अतः b और c सत्य हैं।"
+        },
+        {
+            q: "बालक का विकास होता है—",
+            o: ["सिर से पैर की ओर", "पैर से सिर की ओर", "दोनों ओर से", "इनमें से कोई नहीं"],
+            a: 0,
+            t: "विकास की दिशा के सिद्धांत के अनुसार बालक का विकास सिर से पैर की ओर होता है, जिसे सिफैलोकॉडल (मस्तकाधोमुखी) कहते हैं।"
+        },
+        {
+            q: "विकास के अलग-अलग आयामों में विभिन्नताओं का पाया जाना किस सिद्धांत से संबंधित है?",
+            o: ["व्यक्तिगत विभिन्नताओं का सिद्धांत", "समान प्रतिमान का सिद्धांत", "एकीकरण का सिद्धांत", "परस्पर संबंध का सिद्धांत"],
+            a: 0,
+            t: "व्यक्तिगत विभिन्नताओं का सिद्धांत विकास के अलग-अलग आयामों में व्यक्तियों के बीच अंतर व विभिन्नताओं को स्पष्ट करता है।"
+        },
+        {
+            q: "मानव विकास के संदर्भ में कौन-सा कथन उपयुक्त है?",
+            o: [
+                "विकास विशिष्ट से सामान्य की ओर होता है।",
+                "मानव विकास प्रगतिशील, सुव्यवस्थित और पूर्वानुमेय परिवर्तनों का स्वरूप है जो जीवन पर्यन्त चलता है।",
+                "विकास केवल शैशवावस्था तक ही सीमित रहता है।",
+                "विकास की गति हमेशा स्थिर और अपरिवर्तनीय रहती है।"
+            ],
+            a: 1,
+            t: "मानव प्रगतिशील, सुव्यवस्थित और पूर्वानुमेय परिवर्तनों का स्वरूप है जो गर्भावस्था से जीवन पर्यन्त चलता है।"
+        },
+        {
+            q: "बालकों में शारीरिक और गत्यात्मक विकास की दिशा होती है—",
+            o: ["सिफैलोकॉडल", "प्रॉक्सिमोडिस्टल", "A तथा B दोनों", "अनिश्चित"],
+            a: 2,
+            t: "सिफैलोकॉडल (सिर से पैर की ओर) तथा प्रॉक्सिमोडिस्टल (केंद्र से परिधि/निकट से दूर की ओर)—दोनों ही विकास की निश्चित दिशाएँ हैं।"
+        },
+        {
+            q: "बालक का विकास किसका परिणाम है?",
+            o: ["केवल वंशानुक्रम का", "केवल वातावरण का", "वंशानुक्रम तथा वातावरण की अंतःक्रिया का", "आर्थिक कारकों का"],
+            a: 2,
+            t: "बालक का विकास वंशानुक्रम तथा वातावरण की अंतःक्रिया का परिणाम है। लैंडिस के अनुसार वंशानुक्रम क्षमता देता है और वातावरण उसे विकसित होने का अवसर।"
+        },
+        {
+            q: "किस मनोवैज्ञानिक के अनुसार “विकास एक सतत् और धीमी प्रक्रिया है”?",
+            o: ["कोलसनिक", "जीन पियाजे", "स्किनर", "हरलॉक"],
+            a: 2,
+            t: "अमेरिकी मनोवैज्ञानिक बी.एफ. स्किनर के अनुसार विकास एक सतत् और धीमी प्रक्रिया है।"
+        },
+        {
+            q: "एक बच्चे की वृद्धि और विकास के अध्ययन की सर्वाधिक उपयुक्त विधि है—",
+            o: ["मनोविश्लेषण विधि", "तुलनात्मक विधि", "विकासीय विधि", "सांख्यिकी विधि"],
+            a: 2,
+            t: "विकासात्मक (विकासीय) विधि में बच्चे के विभिन्न चरणों और संपूर्ण विकास का वैज्ञानिक अध्ययन किया जाता है।"
+        },
+        {
+            q: "बाल विकास के क्षेत्र के संबंध में सही कथन का चयन कीजिए—<br><small>(a) बालक की विभिन्न अवस्थाओं का अध्ययन<br>(b) बाल विकास को प्रभावित करने वाले कारकों का अध्ययन<br>(c) वैयक्तिक विभिन्नताओं का अध्ययन<br>(d) बाल विकास के सभी आयामों का अध्ययन</small>",
+            o: ["a, b, c तीनों", "केवल a, b", "केवल c और d", "a, b, c, d सभी"],
+            a: 3,
+            t: "बाल विकास के अंतर्गत अवस्थाओं, कारकों, व्यक्तिगत भिन्नताओं तथा सभी आयामों (शारीरिक, मानसिक, सामाजिक आदि) का समग्र अध्ययन किया जाता है।"
+        },
+        {
+            q: "“शरीर का विकास, उसके अंगों, इन्द्रियों तथा शक्तियों का विकास होना चाहिए, जहाँ तक संभव हो बालक की आंतरिक क्षमताओं का स्वच्छंद विकास करना चाहिए। बालक को जीना सिखाना शिक्षक का कार्य है।” उपरोक्त कथन किसका है?",
+            o: ["रूसो", "महात्मा गांधी", "रविन्द्रनाथ टैगोर", "फ्रोबेल"],
+            a: 3,
+            t: "यह प्रसिद्ध शैक्षिक विचार फ्रोबेल द्वारा प्रतिपादित है।"
+        },
+        {
+            q: "परिमाणात्मक तथा गुणात्मक पक्ष दोनों सम्मिलित होते हैं—",
+            o: ["वृद्धि में", "विकास में", "परिवार में", "समुदाय में"],
+            a: 1,
+            t: "विकास में परिमाणात्मक (मात्रात्मक) तथा गुणात्मक दोनों पक्ष शामिल होते हैं, जबकि वृद्धि केवल परिमाणात्मक होती है।"
+        },
+        {
+            q: "एक अध्यापक के समक्ष सर्वाधिक चुनौतीपूर्ण कार्य क्या है?",
+            o: [
+                "प्रश्नपत्र तैयार करना",
+                "शिक्षण—अधिगम प्रक्रिया को रुचिकर बनाना",
+                "छात्रों को गृहकार्य के लिए तैयार करना",
+                "कक्षा में अनुशासन बनाए रखना"
+            ],
+            a: 1,
+            t: "शिक्षण-अधिगम प्रक्रिया को रुचिकर व बाल-केंद्रित बनाना शिक्षक के लिए सबसे महत्वपूर्ण और चुनौतीपूर्ण कार्य होता है।"
+        },
+        {
+            q: "प्रकृतिवादियों के अनुसार विकास में प्रमुख भूमिका है—",
+            o: [
+                "आनुवांशिकी",
+                "पालन-पोषण",
+                "आनुवांशिकी तथा वातावरण दोनों की",
+                "आनुवांशिकी तथा पालन में अंतःक्रिया की"
+            ],
+            a: 1,
+            t: "प्रकृतिवादियों (Nurture पक्ष के समर्थकों) के अनुसार विकास में प्रमुख भूमिका पालन-पोषण और वातावरण की होती है।"
+        },
+        {
+            q: "“विकास कभी न समाप्त होने वाली प्रक्रिया है।” यह विचार किससे संबंधित है?",
+            o: ["अंतःक्रिया का सिद्धांत", "निरंतरता का सिद्धांत", "अंतर्संबंध का सिद्धांत", "एकीकरण का सिद्धांत"],
+            a: 1,
+            t: "निरंतरता का सिद्धांत यह स्पष्ट करता है कि विकास गर्भाधान से लेकर जीवन पर्यन्त लगातार चलने वाली प्रक्रिया है।"
+        },
+        {
+            q: "विकास की चरम अवस्था किसे कहते हैं?",
+            o: ["शैशवावस्था", "किशोरावस्था", "बाल्यावस्था", "प्रौढ़ावस्था"],
+            a: 1,
+            t: "किशोरावस्था को विकास की चरम/जटिल अवस्था कहा जाता है। स्टेनली हॉल को किशोरावस्था के अध्ययन का जनक माना जाता है।"
+        },
+        {
+            q: "निम्न में से कौन-सा कथन सत्य है?<br><small>(a) विकास, अभिवृद्धि को प्रभावित करता है।<br>(b) अभिवृद्धि की कोई सीमा नहीं होती।<br>(c) अभिवृद्धि विकास को प्रभावित करती है।<br>(d) विकास का संबंध केवल दृश्य अंगों से होता है।</small>",
+            o: ["a और b", "a और c", "a, b और c", "केवल d"],
+            a: 1,
+            t: "विकास और अभिवृद्धि एक-दूसरे को परस्पर प्रभावित करते हैं। अभिवृद्धि की एक निश्चित सीमा (परिपक्वता तक) होती है।"
+        },
+        {
+            q: "विकास का कौन-सा समीकरण सही है?",
+            o: [
+                "परिपक्वता + अधिगम = विकास",
+                "परिपक्वता × अधिगम = विकास",
+                "विकास + अधिगम = परिपक्वता",
+                "परिपक्वता + विकास = अधिगम"
+            ],
+            a: 0,
+            t: "परिपक्वता और अधिगम के योग व अंतःक्रिया से ही विकास संभव होता है।"
+        },
+        {
+            q: "विकास को किन प्रमुख क्षेत्रों में विभाजित किया जाता है?",
+            o: ["शारीरिक", "संज्ञानात्मक", "संवेगात्मक", "उपर्युक्त सभी"],
+            a: 3,
+            t: "मानव विकास शारीरिक, संज्ञानात्मक (मानसिक), संवेगात्मक और सामाजिक क्षेत्रों में विभाजित किया जाता है।"
+        },
+        {
+            q: "व्यक्तिगत शिक्षार्थी एक-दूसरे से किसमें भिन्न होते हैं?",
+            o: ["वृद्धि एवं विकास के सिद्धांत में", "विकास की दर में", "विकास क्रम में", "विकास की सामान्य क्षमता में"],
+            a: 1,
+            t: "प्रत्येक बालक में विकास की दर (गति) भिन्न होती है, यद्यपि विकास का क्रम सभी में एकसमान होता है।"
+        },
+        {
+            q: "बालकों के वृद्धि और विकास की प्रक्रिया निम्न में से किस सिद्धांत पर आधारित है?<br><small>(a) व्यक्तिगत विभिन्नताओं का सिद्धांत<br>(b) विकास की दिशा का सिद्धांत<br>(c) परस्पर संबंध का सिद्धांत<br>(d) अभिप्रेरणा का सिद्धांत</small>",
+            o: ["a और b", "b और c", "a, b और c", "c और d"],
+            a: 2,
+            t: "वृद्धि और विकास व्यक्तिगत विभिन्नता, निश्चित दिशा तथा परस्पर संबंध के सिद्धांतों पर आधारित होते हैं।"
+        },
+        {
+            q: "विकास की सर्वाधिक उपयुक्त परिभाषा/व्याख्या है—",
+            o: [
+                "बालक के सामाजिक क्षेत्र में विकास",
+                "बालक के भार में विकास",
+                "बालक का संवेगात्मक विकास",
+                "वह प्रक्रिया जिसमें बालक परिपक्वता की ओर बढ़ता है।"
+            ],
+            a: 3,
+            t: "विकास एक जटिल प्रक्रिया है जिसमें बालक विभिन्न पक्षों में प्रगति करते हुए समग्र परिपक्वता की ओर अग्रसर होता है।"
+        },
+        {
+            q: "पूर्व अनुभव के आधार पर संवेदना को अर्थ प्रदान करना क्या कहलाता है?",
+            o: ["संवेदना", "कल्पना", "प्रेरणा", "प्रत्यक्ष ज्ञान"],
+            a: 3,
+            t: "संवेदना प्रथम ज्ञान है, और जब पूर्व अनुभवों के आधार पर संवेदना को अर्थ प्राप्त हो जाता है, तो उसे प्रत्यक्ष ज्ञान (Perception) कहते हैं।"
+        }
+    ];
+
+    // 25 प्रश्नों के लिए विभिन्न सेट्स का क्रम
+    const orders = {
+        'A': Array.from({length: 25}, (_, i) => i),
+        'B': Array.from({length: 25}, (_, i) => 24 - i),
+        'C': [4, 18, 2, 21, 15, 0, 7, 23, 11, 8, 14, 1, 19, 5, 22, 12, 9, 20, 3, 16, 6, 24, 10, 17, 13],
+        'D': [12, 24, 1, 17, 8, 20, 3, 15, 0, 19, 7, 23, 11, 5, 22, 14, 2, 18, 6, 21, 9, 16, 4, 13, 10]
+    };
+
+    let currentQuestions = [];
+    let score = 0;
+    let currentPage = 0;
+    const qPerPage = 25; // 25 प्रश्नों का 1 सेट
+    const totalPages = Math.ceil(25 / qPerPage);
+    const userSelections = {};
+
+    function loadSet(type) {
+        document.getElementById('menu-screen').style.display = 'none';
+        document.getElementById('main-container').style.display = 'block';
+        document.getElementById('quiz-title').innerText = `बाल विकास एवं शिक्षाशास्त्र - SET ${type}`;
+        const indices = orders[type];
+        currentQuestions = indices.map(idx => questionsPool[idx]);
+        score = 0;
+        currentPage = 0;
+        for (let key in userSelections) delete userSelections[key];
+        renderPage(0);
+    }
+
+    function renderPage(page) {
+        currentPage = page;
+        const list = document.getElementById('quiz-content');
+        list.innerHTML = "";
+        const start = page * qPerPage;
+        const end = Math.min(start + qPerPage, currentQuestions.length);
+        const pageQs = currentQuestions.slice(start, end);
+
+        pageQs.forEach((item, i) => {
+            const actualIdx = start + i;
+            const card = document.createElement('div');
+            card.className = 'q-card';
+            card.innerHTML = `
+                <div class="q-text">${actualIdx + 1}. ${item.q}</div>
+                <div class="options" id="opt-${actualIdx}">
+                    ${item.o.map((opt, oi) => `<button class="opt-btn" onclick="check(${actualIdx}, ${oi}, this)">${opt}</button>`).join('')}
+                </div>
+                <div class="feedback" id="feed-${actualIdx}"></div>
+            `;
+            list.appendChild(card);
+            if (userSelections[actualIdx] !== undefined) restore(actualIdx, userSelections[actualIdx]);
+        });
+
+        document.getElementById('pageDisplay').innerText = `पेज: ${page + 1} / ${totalPages}`;
+        document.getElementById('prevBtn').disabled = (page === 0);
+        document.getElementById('nextBtn').disabled = (page >= totalPages - 1);
+        window.scrollTo(0,0);
+    }
+
+    function changePage(direction) {
+        const targetPage = currentPage + direction;
+        if (targetPage >= 0 && targetPage < totalPages) {
+            renderPage(targetPage);
+        }
+    }
+
+    function check(qIdx, selIdx, btn) {
+        const item = currentQuestions[qIdx];
+        const buttons = document.getElementById(`opt-${qIdx}`).querySelectorAll('button');
+        const feed = document.getElementById(`feed-${qIdx}`);
+        userSelections[qIdx] = selIdx;
+        buttons.forEach(b => b.disabled = true);
+        if (selIdx === item.a) {
+            btn.classList.add('correct');
+            score++;
+            feed.innerHTML = `✅ सही उत्तर! <br>व्याख्या: ${item.t}`;
+            feed.style.color = "green";
+        } else {
+            btn.classList.add('wrong');
+            buttons[item.a].classList.add('correct');
+            feed.innerHTML = `❌ गलत। सही जवाब है: <b>${item.o[item.a]}</b> <br>व्याख्या: ${item.t}`;
+            feed.style.color = "red";
+        }
+        feed.style.display = "block";
+        document.getElementById('scoreDisplay').innerText = `कुल स्कोर: ${score} / 25`;
+    }
+
+    function restore(qIdx, selIdx) {
+        const item = currentQuestions[qIdx];
+        const buttons = document.getElementById(`opt-${qIdx}`).querySelectorAll('button');
+        const feed = document.getElementById(`feed-${qIdx}`);
+        buttons.forEach(b => b.disabled = true);
+        if (selIdx === item.a) { 
+            buttons[selIdx].classList.add('correct'); 
+            feed.innerHTML = `✅ सही! <br>व्याख्या: ${item.t}`; 
+            feed.style.color = "green";
+        } else { 
+            buttons[selIdx].classList.add('wrong'); 
+            buttons[item.a].classList.add('correct'); 
+            feed.innerHTML = `❌ गलत। सही जवाब है: <b>${item.o[item.a]}</b> <br>व्याख्या: ${item.t}`; 
+            feed.style.color = "red";
+        }
+        feed.style.display = "block";
+    }
+</script>
+</body>
+</html>
