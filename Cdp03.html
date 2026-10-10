@@ -1,0 +1,381 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>बाल विकास एवं शिक्षाशास्त्र क्विज़</title>
+    <style>
+        :root {
+            --primary: #2c3e50;
+            --accent: #d35400;
+            --success: #27ae60;
+            --danger: #c0392b;
+            --bg: #f4f7f6;
+        }
+        body { font-family: 'Segoe UI', Arial, sans-serif; background-color: var(--bg); margin: 0; padding: 10px; color: #333; }
+        
+        /* Selection Menu */
+        #menu-screen {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: var(--primary);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 2000;
+            color: white;
+        }
+        .menu-box {
+            background: white;
+            padding: 40px;
+            border-radius: 20px;
+            text-align: center;
+            color: #333;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.4);
+            max-width: 450px;
+        }
+        .set-btn {
+            display: block;
+            width: 100%;
+            padding: 15px;
+            margin: 10px 0;
+            font-size: 1.2em;
+            font-weight: bold;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: 0.3s;
+            color: white;
+        }
+        .btn-a { background: #3498db; }
+        .btn-b { background: #9b59b6; }
+        .btn-c { background: #27ae60; }
+        .btn-d { background: #e67e22; }
+        .set-btn:hover { transform: scale(1.03); filter: brightness(1.1); }
+
+        /* Quiz UI */
+        .container { max-width: 850px; margin: 0 auto; background: white; padding: 25px; border-radius: 15px; display: none; box-shadow: 0 5px 20px rgba(0,0,0,0.05); }
+        header { text-align: center; border-bottom: 3px solid var(--accent); margin-bottom: 20px; padding-bottom: 10px; }
+        .stats-bar { position: sticky; top: 10px; z-index: 1000; display: flex; justify-content: space-between; background: var(--primary); color: white; padding: 15px 20px; border-radius: 10px; margin-bottom: 20px; font-weight: bold; box-shadow: 0 4px 10px rgba(0,0,0,0.2); }
+        .q-card { background: #fff; border: 1px solid #ddd; border-radius: 10px; padding: 20px; margin-bottom: 20px; border-left: 6px solid var(--accent); }
+        .q-text { font-size: 1.15em; font-weight: 700; margin-bottom: 15px; color: #2c3e50; line-height: 1.5; }
+        .options { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+        @media (max-width: 600px) { .options { grid-template-columns: 1fr; } }
+        button.opt-btn { padding: 12px; border: 1px solid #dee2e6; background: #fff; border-radius: 6px; cursor: pointer; text-align: left; font-size: 1em; }
+        button.correct { background: #d4edda !important; color: #155724; font-weight: bold; border-color: var(--success); }
+        button.wrong { background: #f8d7da !important; color: #721c24; border-color: var(--danger); }
+        .feedback { margin-top: 12px; display: none; font-weight: 600; padding: 10px; border-radius: 5px; background: #f1f2f6; border-left: 4px solid var(--accent); line-height: 1.4; }
+        .pagination { display: flex; justify-content: center; gap: 15px; margin-top: 30px; border-top: 2px solid #eee; padding-top: 20px; }
+        .nav-btn { padding: 10px 30px; background: var(--accent); color: white; border: none; border-radius: 5px; cursor: pointer; font-weight: bold; }
+        .nav-btn:disabled { background: #ccc; cursor: not-allowed; }
+    </style>
+</head>
+<body>
+
+<div id="menu-screen">
+    <div class="menu-box">
+        <h2 style="margin-top:0">बाल विकास एवं शिक्षाशास्त्र (CDP)</h2>
+        <p>25 महत्वपूर्ण प्रश्न | शिक्षक भर्ती परीक्षा स्तर<br>कृपया अपना सेट चुनें:</p>
+        <button class="set-btn btn-a" onclick="loadSet('A')">SET A</button>
+        <button class="set-btn btn-b" onclick="loadSet('B')">SET B</button>
+        <button class="set-btn btn-c" onclick="loadSet('C')">SET C</button>
+        <button class="set-btn btn-d" onclick="loadSet('D')">SET D</button>
+    </div>
+</div>
+
+<div class="container" id="main-container">
+    <header>
+        <h1 id="quiz-title">बाल विकास एवं शिक्षाशास्त्र क्विज़</h1>
+        <p>बाल्यावस्था, किशोरावस्था एवं शारीरिक-संवेगात्मक विकास</p>
+    </header>
+    <div class="stats-bar">
+        <div id="scoreDisplay">कुल स्कोर: 0 / 25</div>
+        <div id="pageDisplay">पेज: 1 / 1</div>
+    </div>
+    <div id="quiz-content"></div>
+    <div class="pagination">
+        <button class="nav-btn" id="prevBtn" onclick="changePage(-1)" disabled>पिछला</button>
+        <button class="nav-btn" id="nextBtn" onclick="changePage(1)">अगला</button>
+    </div>
+</div>
+
+<script>
+    const questionsPool = [
+        {
+            q: "मनोवैज्ञानिकों द्वारा विकास मुख्य रूप से विभाजित की गयी अवस्थाओं में निम्न में से कौन सी सही है?<br>1. शैशवावस्था, गर्भावस्था, किशोरावस्था<br>2. गर्भावस्था, शैशवावस्था, बाल्यावस्था, उत्तर शैशवावस्था<br>3. शैशवावस्था, आरंभिक बाल्यावस्था, उत्तर बाल्यावस्था, किशोरावस्था<br>4. आरंभिक शैशवावस्था, बाल्यावस्था, उत्तर शैशवावस्था, किशोरावस्था",
+            o: ["केवल 1 सही", "1 और 2 दोनों सही", "केवल 3 सही", "केवल 4 सही"],
+            a: 2,
+            t: "मनोवैज्ञानिकों के अनुसार बाल विकास को मुख्य रूप से चार अवस्थाओं में विभाजित किया गया है – (1) शैशवावस्था (1–3 वर्ष) (2) आरंभिक बाल्यावस्था (3–6 वर्ष) (3) उत्तर बाल्यावस्था (6–12 वर्ष) (4) किशोरावस्था (12–18 वर्ष)।"
+        },
+        {
+            q: "नवजात शिशु की सावेगिक क्षमताओं पर किए गए शोध बताते हैं कि—",
+            o: [
+                "नवजात शिशु के लिए जगत संवेदनाओं का एक पेचीदा तालमेल है।",
+                "नवजात शिशु कई चीजें कर सकता है जैसे आवाज, रंग, गंध को पहचानना।",
+                "नवजात शिशु की दृष्टि एक वयस्क की दृष्टि जितनी विकसित होती है।",
+                "जन्म के समय केवल सुनने की शक्ति पूर्णतः विकसित रहती है।"
+            ],
+            a: 1,
+            t: "शोध दर्शाते हैं कि नवजात शिशु कई चीजें कर सकता है, जैसे आवाज़, रंग एवं गंध को पहचानना तथा प्रतिक्रिया देना।"
+        },
+        {
+            q: "निम्नलिखित में से कौन सा भावात्मक लगाव को दर्शाता है—",
+            o: ["चलना सीखना", "भाषा का विकास", "भोजन करना सीखना", "अलग होने की घबराहट"],
+            a: 3,
+            t: "अलग होने की घबराहट (Separation Anxiety) शिशु के प्राथमिक देखभालकर्ता के प्रति गहरे संवेगात्मक/भावात्मक लगाव को दर्शाती है।"
+        },
+        {
+            q: "जीवन का वह काल जब शरीर में प्रजनन परिपक्वता संबंधी परिवर्तन होने लगते हैं—",
+            o: ["प्रौढ़ावस्था", "किशोरावस्था", "बाल्यावस्था", "शैशवावस्था"],
+            a: 1,
+            t: "जीवन की वह अवधि जब शरीर में प्रजनन परिपक्वता लाने वाले हार्मोनल व जैविक परिवर्तन होते हैं, किशोरावस्था (11–18 वर्ष) कहलाती है।"
+        },
+        {
+            q: "जन्मपूर्व विकास का सही क्रम है—",
+            o: [
+                "युग्मनज, भ्रूण, गर्भस्थ शिशु",
+                "भ्रूण, गर्भस्थ शिशु, युग्मनज",
+                "गर्भस्थ शिशु, भ्रूण, युग्मनज",
+                "युग्मनज, गर्भस्थ शिशु, भ्रूण"
+            ],
+            a: 0,
+            t: "गर्भधारण के बाद विकास का क्रम: युग्मनज (Zygote) → भ्रूण (Embryo) → गर्भस्थ शिशु (Fetus) होता है।"
+        },
+        {
+            q: "उत्तर बाल्यावस्था में बालक भौतिक वस्तुओं के किस तत्व में परिवर्तन को समझने लगता है—",
+            o: ["द्रव्यमान", "संख्या", "द्रव्यमान और संख्या", "द्रव्यमान, संख्या और क्षेत्र"],
+            a: 3,
+            t: "पियाजे के अनुसार उत्तर बाल्यावस्था (मूर्त संक्रियात्मक अवस्था) में बालक संरक्षण (Conservation) के नियमों जैसे द्रव्यमान, संख्या और क्षेत्रफल को समझने लगता है।"
+        },
+        {
+            q: "निम्न में से किस अवस्था में शब्दों को दोहराने की प्रवृत्ति विशेष रूप से पायी जाती है—",
+            o: ["शैशवावस्था", "बाल्यावस्था", "किशोरावस्था", "प्रौढ़ावस्था"],
+            a: 0,
+            t: "शैशवावस्था में अनुकरण द्वारा सीखने की तीव्र प्रवृत्ति होती है, इसलिए बच्चे शब्दों को बार-बार दोहराते हैं।"
+        },
+        {
+            q: "निम्न में से कौन सी बाल्यावस्था की प्रमुख विशेषता नहीं है—",
+            o: ["शारीरिक व मानसिक स्थिरता", "वास्तविक जगत से संबंध", "दूसरों पर निर्भरता", "रचनात्मक कार्यों में आनंद"],
+            a: 2,
+            t: "दूसरों पर पूर्ण निर्भरता शैशवावस्था की विशेषता है, जबकि बाल्यावस्था में बच्चा आत्मनिर्भर बनने की दिशा में अग्रसर होता है।"
+        },
+        {
+            q: "किशोरावस्था की विशेषताओं को सर्वोत्तम रूप से व्यक्त करने वाला एक शब्द है—",
+            o: ["विकास", "परिवर्तन", "समायोजन", "अस्थिरता"],
+            a: 1,
+            t: "किशोरावस्था को सर्वोत्तम रूप से व्यक्त करने वाला शब्द 'परिवर्तन' है, जिसमें तीव्र शारीरिक, सामाजिक एवं मनोवैज्ञानिक बदलाव आते हैं।"
+        },
+        {
+            q: "बाल विकास की किस अवस्था को भाषा सीखने की सर्वोत्तम अवस्था कहा जाता है?",
+            o: ["शैशवावस्था", "पूर्व बाल्यावस्था", "मध्य बाल्यावस्था", "उत्तर बाल्यावस्था"],
+            a: 1,
+            t: "पूर्व बाल्यावस्था (2 से 6 वर्ष) भाषा अर्जन के लिए सबसे संवेदनशील और सर्वोत्तम अवस्था मानी जाती है।"
+        },
+        {
+            q: "तनाव व क्रोध की अवस्था होती है—",
+            o: ["शैशवावस्था", "किशोरावस्था", "बाल्यावस्था", "वृद्धावस्था"],
+            a: 1,
+            t: "स्टेनली हॉल के अनुसार किशोरावस्था 'तनाव, तूफान और संघर्ष' की अवस्था है।"
+        },
+        {
+            q: "किस उम्र में बालक मुख्य रंगों की पहचान कर लेता है?",
+            o: ["5 वर्ष", "2 वर्ष", "3 वर्ष", "4 वर्ष"],
+            a: 1,
+            t: "लगभग 2 से 3 वर्ष की उम्र तक बच्चे मुख्य प्राथमिक रंगों की पहचान व अंतर करना शुरू कर देते हैं।"
+        },
+        {
+            q: "शारीरिक विकास का संबंध होता है—<br>I. शरीर के भार से<br>II. शरीर की वृद्धि से<br>III. हड्डियों की वृद्धि से<br>IV. परिपक्वता से",
+            o: ["I और II", "II और III", "I, II, III, IV सभी", "I, II और III"],
+            a: 3,
+            t: "शारीरिक विकास के प्रमुख भौतिक घटकों में शरीर का भार, लंबाई/वृद्धि और अस्थियों (हड्डियों) की वृद्धि मुख्य रूप से शामिल हैं।"
+        },
+        {
+            q: "कक्षा शिक्षण अधिगम में अंतःक्रियाओं को सुधारने हेतु निम्न में से कौन सी रणनीति उत्तर किशोरावस्था के विकास से संबंधित है—",
+            o: [
+                "क्रिया आधारित प्रस्तुति",
+                "कक्षा में अनुकरणात्मक कार्य",
+                "विचारों के मुक्त आदान-प्रदान के साथ आदर्शीकरण",
+                "दत्त वाचन एवं लेखन"
+            ],
+            a: 2,
+            t: "उत्तर किशोरावस्था में अमूर्त चिंतन परिपक्व होता है, अतः विचारों के मुक्त आदान-प्रदान और आदर्शीकरण पर आधारित चर्चाएं सबसे प्रभावी रणनीति हैं।"
+        },
+        {
+            q: "निम्न में से कौन सी विशेषताएँ शैशवावस्था से संबंधित नहीं हैं?<br>I. सीखने की प्रक्रिया में तीव्रता<br>II. अनुकरण द्वारा सीखने की प्रवृत्ति<br>III. चिंतन प्रक्रिया<br>IV. टोली/समूह की अवस्था",
+            o: ["I और II", "II और III", "III और IV", "II, III, IV"],
+            a: 2,
+            t: "अमूर्त चिंतन किशोरावस्था की विशेषता है और टोली/समूह बाल्यावस्था की विशेषता है। अतः III और IV शैशवावस्था की विशेषताएँ नहीं हैं।"
+        },
+        {
+            q: "\"किशोरावस्था को सर्वोत्तम प्रकार से परिभाषित करने वाला एक शब्द 'परिवर्तन' है; यह परिवर्तन शारीरिक, सामाजिक एवं मनोवैज्ञानिक है।\" यह कथन किसका है?",
+            o: ["बिगी एवं हण्ट", "किलपेट्रिक", "जरशील्ड", "हरलॉक"],
+            a: 0,
+            t: "यह प्रसिद्ध कथन बिगी एवं हण्ट (Bigge and Hunt) का है।"
+        },
+        {
+            q: "दूसरे वर्ष के अंत तक शिशु का शब्द भण्डार लगभग हो जाता है—",
+            o: ["100 शब्द", "60 शब्द", "50 शब्द", "10 शब्द"],
+            a: 0,
+            t: "मनोवैज्ञानिक अध्ययनों (जैसे स्मिथ के अनुसार) दो वर्ष के अंत तक शिशु का सक्रिय शब्द भंडार लगभग 100 से 200 शब्दों का हो जाता है।"
+        },
+        {
+            q: "शारीरिक विकास का क्षेत्र है—<br>I. स्नायुमण्डल<br>II. मांसपेशियों की वृद्धि<br>III. एण्डोक्राइन ग्लैंड्स<br>IV. मानसिक वृद्धि",
+            o: ["I और II", "I, II और III", "II और III", "I, II, III और IV"],
+            a: 1,
+            t: "स्नायुमण्डल, मांसपेशियों की वृद्धि तथा अंतःस्रावी ग्रंथियाँ (Endocrine Glands) शारीरिक विकास के क्षेत्र हैं, जबकि मानसिक वृद्धि संज्ञानात्मक विकास के अंतर्गत आती है।"
+        },
+        {
+            q: "विद्रोह की भावना की प्रवृत्ति किस अवस्था से संबंधित है—",
+            o: ["बाल्यावस्था", "शैशवावस्था", "पूर्व किशोरावस्था", "मध्य किशोरावस्था"],
+            a: 2,
+            t: "विद्रोह और स्वतंत्रता की तीव्र भावना पूर्व किशोरावस्था (11–13 वर्ष) के दौरान सबसे प्रखर रूप से उभरती है।"
+        },
+        {
+            q: "एक 13 वर्षीय बालक बात-बात पर अपने बड़ों से झगड़ा करने लगता है, हमेशा स्वयं को सही साबित करने की कोशिश करता है। वह विकास की किस अवस्था में है—",
+            o: ["प्रारंभिक बाल्यावस्था", "युवावस्था", "किशोरावस्था", "बाल्यावस्था"],
+            a: 2,
+            t: "किशोरावस्था में आत्मसम्मान, पहचान का संकट और स्वायत्तता की चाह के कारण किशोर बड़ों के प्रभुत्व का विरोध करने लगते हैं।"
+        },
+        {
+            q: "दर्पण में अपने चेहरे को निरंतर देखते रहना, केवल अपने आप से प्यार करना एवं घनिष्ठ मित्रता की प्रवृत्ति— फ्रायड ने इस अवस्था एवं गुण को किस प्रकार वर्णित किया है?",
+            o: ["आत्ममोह, बाल्यावस्था", "समूह प्रवृत्ति, युवावस्था", "आत्ममोह, किशोरावस्था", "लैंगिक प्रेरण, शैशवावस्था"],
+            a: 2,
+            t: "सिगमंड फ्रायड के अनुसार किशोरावस्था में 'नार्सिसिज्म' (आत्ममोह/स्वमोह) देखा जाता है और इसी अवस्था में घनिष्ठ मित्रता की प्रवृत्ति पाई जाती है।"
+        },
+        {
+            q: "बाल्यावस्था में बालक का व्यक्तित्व प्रायः होता है—<br>I. अंतर्मुखी<br>II. बहिर्मुखी<br>III. तर्कसंगत<br>IV. अपरिवर्तनशील",
+            o: ["I और II", "II और III", "I, III, IV", "III और IV"],
+            a: 1,
+            t: "बाल्यावस्था में बच्चे बाहरी परिवेश व साथियों के साथ सक्रिय रहते हैं (बहिर्मुखी) तथा उनमें प्रत्यक्ष वस्तुओं के प्रति तर्कसंगत चिंतन का विकास होता है।"
+        },
+        {
+            q: "आनुवंशिकता को कैसी सामाजिक संरचना के रूप में माना जाता है?",
+            o: ["माध्यमिक", "गतिशील", "स्थिर", "प्राथमिक"],
+            a: 2,
+            t: "आनुवंशिकता को एक स्थिर (Static) संरचना माना जाता है क्योंकि गर्भाधान के समय जो जीन्स बच्चे को मिलते हैं, उनमें बाद में बुनियादी बदलाव नहीं किया जा सकता।"
+        },
+        {
+            q: "किशोरावस्था में चरित्र निर्माण से जो अवस्था संबंधित है, वह निम्न में से है—",
+            o: [
+                "परंपराओं को धारण करने की अवस्था",
+                "आधारहीन आत्म-चेतना अवस्था",
+                "आधारयुक्त आत्म-चेतना अवस्था",
+                "स्वकेन्द्रित अवस्था"
+            ],
+            a: 1,
+            t: "किशोरावस्था को 'आधारहीन आत्म-चेतना अवस्था' कहा जाता है, जहाँ किशोर बिना किसी ठोस आधार के अपनी पहचान और आत्म-छवि को लेकर अत्यधिक संवेदनशील रहता है।"
+        },
+        {
+            q: "शारीरिक वृद्धि पर सीधा प्रभाव डालने वाली प्रमुख ग्रंथि कौन सी है?",
+            o: ["एड्रिनल", "थायमस", "पीनियल", "पिट्यूटरी"],
+            a: 3,
+            t: "पिट्यूटरी ग्रंथि (पीयूष ग्रंथि) से वृद्धि हार्मोन (HGH) स्रावित होता है, जो मांसपेशियों और अस्थियों की वृद्धि को नियंत्रित करता है।"
+        }
+    ];
+
+    const totalQ = questionsPool.length;
+    const qPerPage = 25;
+
+    const orders = {
+        'A': Array.from({length: totalQ}, (_, i) => i),
+        'B': Array.from({length: totalQ}, (_, i) => totalQ - 1 - i),
+        'C': [14, 3, 21, 7, 0, 12, 4, 19, 6, 11, 2, 17, 8, 20, 15, 9, 18, 13, 16, 24, 10, 22, 23, 5, 1],
+        'D': [2, 12, 1, 19, 7, 11, 23, 4, 20, 8, 15, 16, 10, 24, 9, 18, 22, 13, 14, 3, 17, 6, 21, 5, 0]
+    };
+
+    let currentQuestions = [];
+    let score = 0;
+    let currentPage = 0;
+    const userSelections = {};
+
+    function loadSet(type) {
+        document.getElementById('menu-screen').style.display = 'none';
+        document.getElementById('main-container').style.display = 'block';
+        document.getElementById('quiz-title').innerText = `बाल विकास एवं शिक्षाशास्त्र - SET ${type}`;
+        const indices = orders[type];
+        currentQuestions = indices.map(idx => questionsPool[idx]);
+        renderPage(0);
+    }
+
+    function renderPage(page) {
+        currentPage = page;
+        const totalPages = Math.ceil(totalQ / qPerPage);
+        const list = document.getElementById('quiz-content');
+        list.innerHTML = "";
+        const start = page * qPerPage;
+        const end = Math.min(start + qPerPage, totalQ);
+        const pageQs = currentQuestions.slice(start, end);
+
+        pageQs.forEach((item, i) => {
+            const actualIdx = start + i;
+            const card = document.createElement('div');
+            card.className = 'q-card';
+            card.innerHTML = `
+                <div class="q-text">${actualIdx + 1}. ${item.q}</div>
+                <div class="options" id="opt-${actualIdx}">
+                    ${item.o.map((opt, oi) => `<button class="opt-btn" onclick="check(${actualIdx}, ${oi}, this)">${opt}</button>`).join('')}
+                </div>
+                <div class="feedback" id="feed-${actualIdx}"></div>
+            `;
+            list.appendChild(card);
+            if (userSelections[actualIdx] !== undefined) restore(actualIdx, userSelections[actualIdx]);
+        });
+
+        document.getElementById('pageDisplay').innerText = `पेज: ${page + 1} / ${totalPages}`;
+        document.getElementById('prevBtn').disabled = (page === 0);
+        document.getElementById('nextBtn').disabled = (page >= totalPages - 1);
+        window.scrollTo(0,0);
+    }
+
+    function changePage(direction) {
+        const totalPages = Math.ceil(totalQ / qPerPage);
+        const newPage = currentPage + direction;
+        if (newPage >= 0 && newPage < totalPages) {
+            renderPage(newPage);
+        }
+    }
+
+    function check(qIdx, selIdx, btn) {
+        const item = currentQuestions[qIdx];
+        const buttons = document.getElementById(`opt-${qIdx}`).querySelectorAll('button');
+        const feed = document.getElementById(`feed-${qIdx}`);
+        userSelections[qIdx] = selIdx;
+        buttons.forEach(b => b.disabled = true);
+        if (selIdx === item.a) {
+            btn.classList.add('correct');
+            score++;
+            feed.innerHTML = `✅ सही उत्तर! <br><b>व्याख्या:</b> ${item.t}`;
+            feed.style.color = "green";
+        } else {
+            btn.classList.add('wrong');
+            buttons[item.a].classList.add('correct');
+            feed.innerHTML = `❌ गलत उत्तर। सही जवाब है: <b>${item.o[item.a]}</b> <br><b>व्याख्या:</b> ${item.t}`;
+            feed.style.color = "red";
+        }
+        feed.style.display = "block";
+        document.getElementById('scoreDisplay').innerText = `कुल स्कोर: ${score} / ${totalQ}`;
+    }
+
+    function restore(qIdx, selIdx) {
+        const item = currentQuestions[qIdx];
+        const buttons = document.getElementById(`opt-${qIdx}`).querySelectorAll('button');
+        const feed = document.getElementById(`feed-${qIdx}`);
+        buttons.forEach(b => b.disabled = true);
+        if (selIdx === item.a) { 
+            buttons[selIdx].classList.add('correct'); 
+            feed.innerHTML = `✅ सही उत्तर!`; 
+            feed.style.color = "green";
+        } else { 
+            buttons[selIdx].classList.add('wrong'); 
+            buttons[item.a].classList.add('correct'); 
+            feed.innerHTML = `❌ गलत उत्तर। सही जवाब है: <b>${item.o[item.a]}</b>`; 
+            feed.style.color = "red";
+        }
+        feed.style.display = "block";
+        feed.innerHTML += `<br><b>व्याख्या:</b> ${item.t}`;
+    }
+</script>
+
+</body>
+</html>
